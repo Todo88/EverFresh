@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>{% block title %}Fresh Sheet{% endblock %}</title>
+
+
+    <!--Import Semantic UI-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
+            integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
+          integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+    <link rel="shortcut icon"
+          href="https://static.wixstatic.com/media/4d8b16_78a5a6ac64c34352828b711ef698aaac%7Emv2_d_2400_2400_s_4_2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/4d8b16_78a5a6ac64c34352828b711ef698aaac%7Emv2_d_2400_2400_s_4_2.png"
+          type="image/png">
+
+    {% block extra_head %}
+    {% endblock %}
+
+    <!--CSS-->
+    <style type="text/css">
+
+
+
+        /* Padding for Title */
+        body {
+            background-color: rgba(212, 208, 208, 0.23);
+        }
+
+        /* Make Vegetable names more easily readable in table */
+        h1 {
+            padding-top: 0.5em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+    </style>
+
+
+</head>
+{% block background %}
+    <body>
+
+
+    <div class="ui secondary menu">
+        <a href="/" class="item {% if request.path == '/' %}active{% endif %}">
+            Fresh Sheet Index
+        </a>
+        <a href="/admin" class="item">
+            Admin
+        </a>
+        <a href="/cart" class="item">
+            Cart
+        </a>
+        <div class="right menu">
+            <div class="item">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Search...">
+                    <i class="search link icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container">
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+    </body>
+{% endblock %}
+<script>
+    $(document).ready(function () {
+        //$('.menu .item').tab()
+    })
+</script>
+</html>

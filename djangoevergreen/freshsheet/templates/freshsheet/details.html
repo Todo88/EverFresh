@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <!-- CSS -->
+
+    <!--Page Title-->
+
+    <h1 style="alignment: center;"> {{ freshsheet.created_at }} Fresh Sheet </h1>
+
+    <!--Menu-->
+
+    <div class="ui top attached tabular menu">
+        <a class="active item" data-tab="first">Fresh Sheet</a>
+        <a class="item" data-tab="second">List View</a>
+    </div>
+
+    <!--Fresh Sheet-->
+    <div class="ui bottom attached active tab segment" data-tab="first">
+        <div class="ui link items">
+            <div class="ui doubling grid">
+                {% for food_item in freshsheet.items.all|dictsort:"name" %}
+                    <div class="box seven wide mobile five wide tablet four wide computer column">
+                    <span class="v_modal_button" foodsheet-modal-id="#food_modals_{{ food_item.pk }}">
+                        <div class="item ui segment">
+                            <span class="ui center align centered instant fade reveal">
+                                <span class="visible content">
+                                    <img style="height: 150px; width: 150px; margin-left:2.62em;" class="ui centered rounded image"
+                                 src='/media/{{ food_item.image }}'>
+                                </span>
+                                <span class="hidden content">
+                                    <img style="filter: brightness(80%); height: 150px; width: 150px; alignment:center;" class="ui centered rounded image"
+                                 src='/media/{{ food_item.image }}'>
+                                </span>
+                            </span>
+                        <div class="ui divider"></div>
+                            <div class="center aligned header"
+                                 style="font-weight: bold; text-align: center;">{{ food_item.name }}
+                                </div>
+                        </div>
+                    </span>
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+    </div>
+
+    <!--List View-->
+
+    <div class="ui bottom attached tab segment" data-tab="second">
+        <div class="ui divided selection list">
+
+            {% for food_item in freshsheet.items.all %}
+                <div class="item">
+                    <span class="v_modal_button" foodsheet-modal-id="#food_modals_{{ food_item.pk }}">
+                    <div class="ui grid">
+                        <h4 class="five wide left aligned column">
+                            <span style="text-decoration-color: black;">{{ food_item.name }}
+                            </span>
+                        </h4>
+                    </div>
+                    </span>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+    {% for food_item in freshsheet.items.all %}
+        <div id="food_modals_{{ food_item.pk }}" class="ui modal">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ food_item.name }} from {{ food_item.farm.name }}
+            </div>
+            <div class="ui left aligned content">
+                <img style="width: 200px; height: 200px;" class="ui rounded image" src='/media/{{ food_item.image }}'>
+                    <div class="ui">{{ food_item.description }}</div>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui negative right labeled icon button">
+                    Order {{ food_item.name }}
+                    <i class="shop icon"></i>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        $(document).ready(function () {
+            $('.menu .item').tab()
+            $('.v_modal_button').click(function () {
+                //$('.ui.modal').modal('show')
+                var modal_id = $(this).attr('foodsheet-modal-id')
+                $(modal_id).modal('show')
+            })
+        })
+    </script>
+
+    <header></header>
+    <div class="card">
+        <div class="card-content">
+
+            {% for item in freshsheet.items.all %}
+                {{ item.name }}
+            {% endfor %}
+
+        </div>
+        <div class="card-action">
+            {{ freshsheet.created_at }}
+        </div>
+    </div>
+    <p></p>
+    <button class="ui button">
+        <a href="/">Back to Index</a>
+    </button>
+{% endblock %}
