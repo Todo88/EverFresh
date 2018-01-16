@@ -54,8 +54,8 @@ ROOT_URLCONF = 'djangoevergreen.urls'
 # Data stored in secret_settings.py
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# # Data stored in secret_settings.py
-# os.getenv('DATABASES')
+
+# Pull os.getenv data from direnv.
 
 DATABASES = {
     'default': {
