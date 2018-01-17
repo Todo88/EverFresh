@@ -153,3 +153,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# -----------------------------------------------------------------------------
+# SSL
+# -----------------------------------------------------------------------------
+
+SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
