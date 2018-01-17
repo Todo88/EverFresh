@@ -1,6 +1,6 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import datetime
-
 
 # Create your models here.
 
@@ -282,3 +282,26 @@ class FreshSheet(models.Model):
 
     def __str__(self):
         return str(self.created_at)
+
+# ------------------------------------------------------------------------------
+# Cart Input
+# ------------------------------------------------------------------------------
+
+
+class OrderItem(models.Model):
+    item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=7, decimal_places=2)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+
+
+class Order(models.Model):
+    pass
+
+# ------------------------------------------------------------------------------
+# User Override
+# ------------------------------------------------------------------------------
+
+
+class User(AbstractUser):
+    cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)

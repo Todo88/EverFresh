@@ -94,7 +94,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoevergreen.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 
@@ -153,6 +153,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+AUTH_USER_MODEL = 'freshsheet.User'
 
 # -----------------------------------------------------------------------------
 # SSL
