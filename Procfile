@@ -1,1 +1,1 @@
-web: gunicorn djangoevergreen.wsgi --log-file -
+web: gunicorn EvergreenUnited.wsgi --log-file -
