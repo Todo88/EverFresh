@@ -305,5 +305,4 @@ class Order(models.Model):
 
 class User(AbstractUser):
     pass
-
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
