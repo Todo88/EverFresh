@@ -154,7 +154,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-AUTH_USER_MODEL = 'freshsheet.User'
+AUTH_USER_MODEL = 'freshsheet.models.User'
 
 # -----------------------------------------------------------------------------
 # SSL
