@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from .models import FreshSheet
 
 
+
+
+
 def index(request):
     # return HttpResponse("You're at the Fresh Sheet index.")
 
@@ -20,10 +23,6 @@ def details(request, id):
     freshsheet = FreshSheet.objects.get(id=id)
 
     # print(dir(freshsheet))
-
-
-
-
 
     # pip install ipdb then run this, this drops you into an interactive "debugger"
     # where you can check what variables actually are and play with them easily
@@ -44,4 +43,8 @@ def details(request, id):
 
 def cart(request):
 
-    return render(request, 'freshsheet/cart.html')
+    context = {
+        'cart': cart,
+    }
+
+    return render(request, 'freshsheet/cart.html', context)

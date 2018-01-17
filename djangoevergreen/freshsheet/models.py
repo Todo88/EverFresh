@@ -10,28 +10,6 @@ from datetime import datetime
 
 
 class Farm(models.Model):
-    # Example: ('BH', 'Black Hills Organic Microgreens, Olympia, WA')
-    # FARMS = (
-    #     ('BH', 'Black Hills Organic Microgreens, Olympia, WA'),
-    #     ('BY', 'Blazing Yarrow, Independence Valley, WA'),
-    #     ('CA', 'Calliope Farm, Olympia, WA'),
-    #     ('DR', 'Dharma Ridge, Olympia, WA'),
-    #     ('HJ', 'Helsing Junction Farm, Independence Valley, WA'),
-    #     ('HS', 'Humble Stump Farm, Shelton, WA'),
-    #     ('RR', 'Rising River Farm, Independence Valley, WA'),
-    #     ('SRM', 'Skokomish Ridge Mushroom Co-Op, Shelton, WA'),
-    #     ('SVF', 'Skokomish Valley Farms, Shelton, WA'),
-    #     ('SB', 'Spooner Berry Farms, Olympia, WA'),
-    #     ('WC', 'Wobbly Cart Farm, Independence Valley, WA'),
-    #     ('BC', 'Bloom Creek Cranberries, Little Rock, WA'),
-    # )
-    #
-    # farms = models.CharField(
-    #     max_length=255,
-    #     choices=FARMS,
-    #     null=True,
-    #     blank=True,
-    # )
 
     # Example: Bloom Creek Cranberries, Little Rock, WA
     name = models.CharField(
@@ -257,49 +235,6 @@ class FoodItem(models.Model):
 
     def __str__(self):
         return self.name
-
-# class Vegetable(Item):
-#     # Example: Rainbow Carrot
-#     # name = models.CharField(
-#     #     default='',
-#     #     max_length=100,
-#     # )
-#     #
-#     # farm = models.ForeignKey(
-#     #     Farm,
-#     #     related_name='vegetables',
-#     #     on_delete=models.PROTECT
-#     # )
-#
-#     # Example: ('G', 'Greens'),
-#     CATEGORY = (
-#         ('G', 'Greens'),
-#         ('B', 'Beans'),
-#         ('A', 'Alliums'),
-#         ('CH', 'Chicories'),
-#         ('CA', 'Cabbage'),
-#         ('HF', 'Herbs/Flowers'),
-#         ('P', 'Potatoes'),
-#         ('R', 'Root Vegetables'),
-#         ('SS', 'Summer Squash'),
-#         ('WS', 'Winter Squash'),
-#     )
-#
-#     category = models.CharField(
-#         max_length=40,
-#         choices=CATEGORY,
-#         null=True,
-#         blank=False,
-#     )
-#
-#     # color = (
-#     #     ('R', 'Red'),
-#     # )
-#
-#
-# class Meat(Item):
-#     poultry = models.BooleanField(default=False)
-
 
 # ------------------------------------------------------------------------------
 # Restaurant Database Input

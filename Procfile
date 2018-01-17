@@ -1,1 +1,1 @@
-web: gunicorn EvergreenUnited.wsgi --log-file -
+web: cd djangoevergreen && gunicorn wsgi --log-file -
