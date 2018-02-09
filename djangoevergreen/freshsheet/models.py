@@ -289,14 +289,35 @@ class FreshSheet(models.Model):
 
 
 class OrderItem(models.Model):
+    user = models.ForeignKey('User', on_delete=models.PROTECT)
+    active = models.BooleanField()
     item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=7, decimal_places=2)
-    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='items')
 
 
 class Order(models.Model):
-    pass
+
+    order_id = models.PositiveIntegerField(
+        "Order Number",
+        null=True,
+        default=None,
+        unique=True,
+    )
+
+    # def order_total(self, cart, request):
+    #     order_total = 0
+    #     for OrderItem.item in cart:
+    #         OrderItem.price += order_total
+    #
+    #     sum(OrderItem.price, self).order_total(cart, request)
+    #
+    # def populate_from_cart(self, cart, request):
+    #     super(Order, self).populate_from_cart(cart, request)
+    @property
+    def price(self):
+        return sum([i.price for i in self.items.all()])
 
 # ------------------------------------------------------------------------------
 # User Override
@@ -304,5 +325,9 @@ class Order(models.Model):
 
 
 class User(AbstractUser):
-    pass
+
+    class Meta(AbstractUser.Meta):
+        swappable = 'AUTH_USER_MODEL'
+
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+

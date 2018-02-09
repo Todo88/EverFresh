@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Invoice</title>
+
+
+    <!--Import Semantic UI-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
+            integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
+          integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+    <link rel="shortcut icon"
+          href="https://static.wixstatic.com/media/4d8b16_78a5a6ac64c34352828b711ef698aaac%7Emv2_d_2400_2400_s_4_2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/4d8b16_78a5a6ac64c34352828b711ef698aaac%7Emv2_d_2400_2400_s_4_2.png"
+          type="image/png">
+
+{% block content %}
+    <table class="ui compact celled definition table">
+    <thead class="full-width">
+    <tr>
+        <th style="font-size: 120%;" class="ten wide left aligned">Product</th>
+        <th style="font-size: 120%;" class="four wide right aligned">Quantity</th>
+        <th style="font-size: 120%;" class="two wide right aligned">Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for line in request.user.cart.items.all %}
+        <tr>
+            <td>
+                {{ line.item }}<br>
+            </td>
+            <td class="right aligned">
+                <div class="field">
+                    <div class="ui fluid right labeled input">
+                        <input title="quantity" name="quantity_{{ line.pk }}" type="number" min="1" max="9999" class="right aligned"
+                               value="{{ line.quantity }}">
+                        <div style="width: 5em;" class="ui right aligned basic label">
+                            {{ line.get_unit_verbose }}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="right aligned">${{ line.total_cost }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot class="full-width">
+    <tr>
+        <th></th>
+        <th>
+            <button class="tiny ui green fluid button">
+                Update quantities
+            </button>
+        </th>
+        <th style="font-weight: bold;" class="right aligned">
+            ${{ request.user.cart.order_total_cost }}
+        </th>
+    </tr>
+    </tfoot>
+</table>
+{% endblock %}
