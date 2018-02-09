@@ -81,10 +81,10 @@
         <div class="ui input">
             <input type="text" name="units" placeholder="{{ food_item.unit }} of {{ food_item.name }}">
         </div>
-        <div class="ui negative right labeled icon button">
+        <a href="{% url 'add_to_cart' food_item.pk 1 %}?freshsheet_pk={{ freshsheet.pk }}" class="ui negative right labeled icon button">
             Order {{ food_item.name }}
             <i class="shop icon"></i>
-        </div>
+        </a>
     </div>
 </div>
 {% endfor %}
@@ -101,20 +101,11 @@
 </script>
 
 <header></header>
-<div class="card">
-    <div class="card-content">
 
-        {% for item in freshsheet.items.all %}
-        {{ item.name }}
-        {% endfor %}
-
-    </div>
-    <div class="card-action">
-        {{ freshsheet.created_at }}
-    </div>
-</div>
 <p></p>
 <button class="ui button">
     <a href="/">Back to Index</a>
 </button>
+<div style="padding-bottom:10em;">
+</div>
 {% endblock %}

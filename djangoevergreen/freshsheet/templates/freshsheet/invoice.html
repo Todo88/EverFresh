@@ -1,10 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Invoice{% endblock %}
+
+
+{% block content %}
+    <div>
+        <div style="padding-top: 0.5em; text-align: right; opacity: 0.2; font-size: 500%; font-weight: bolder;">
+            INVOICE
+        </div>
+<!------------------------------------- Evergreen Logo, Contact info-------------------------------------->
+        <table>
+        <tbody style="height:20px;">
+        <tr style="">
+            <td><img src="{% static "images/Logo/EvergreenLogo.png" %}" style="height: 150px; width: 150px;"
+                     alt="Evergreen United"></td>
+            <td style="padding-left: 10px;"><br>Evergreen United<br>Shelton, WA 98584<br>555-555-5555<br><a href="https://www.eufoodhub.com/">https://www.eufoodhub.com/</a></td>
+            <td style="text-align:right;"><br><br><br><br></td>
+            <td style="text-align:right;"><br><br><br><br></td>
+            <td style="text-align:right;"><br><br><br><br></td>
+
+<!------------------------------------- ORDER DATE AND INVOICE NUMBER -------------------------------------->
+            <td style="text-align:right; width: 100em;"><br><br><br><br></td>
+            <td style="text-align:right;width:20em;"><br><br><br><div style="font-weight: bold;">ORDER DATE:</div><div style="font-weight: bold;">INVOICE #:</div></td>
+            <td style="text-align:left; width: 20em;"><br><br><br><div>{{ invoice.order_date }}</div><div>{{ invoice.pk }}</div></td>
+
+        </tr>
+        </tbody>
+        </table>
+    </div>
+    <div class="ui divider"></div>
+
+    <!------------------------------------- BILL TO -------------------------------------->
+    <table>
+        <tbody><div style="font-weight: bolder;">BILL TO</div>
+    <tr>
+        <td>[Name]<br>[Company Name]<br>[Street Address]<br>[City, ST ZIP]<br>[Phone]<br>[Email Address]</td>
+        <td></td>
+    </tr>
+    </tbody>
+    </table>
+
+    <!-- This form is just for updating quantities. We store the cart in request.user
+    so we can always access the cart data no problem. We just want to update quantities
+    on this page -->
+    <table class="ui compact celled definition table">
+        <thead class="full-width">
+        <tr>
+            <th style="font-size: 120%;" class="eleven wide left aligned">Product</th>
+            <th style="font-size: 120%;" class="one wide right aligned">Quantity</th>
+            <th style="font-size: 120%;" class="two wide left pushed">Units</th>
+            <th style="font-size: 120%;" class="two wide right aligned">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for line in invoice.items.all %}
+            <tr>
+                <td style="font-weight: normal;">
+                    {{ line.item }}
+                </td>
+                <td class="right aligned">
+                    {{ line.quantity }}
+                </td>
+                <td class="left aligned">
+                    {{ line.get_unit_verbose }}
+                </td>
+                <td class="right aligned">${{ line.total_cost }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot class="full-width">
+        <tr>
+            <th style="font-style: italic; text-align: center;">Thank you for your business!</th>
+            <th></th>
+            <th style="font-weight: bold;" class="right aligned">TOTAL</th>
+            <th style="font-weight: bold;" class="right aligned">
+                ${{ invoice.order_total_cost }}</th>
+        </tr>
+        </tfoot>
+    </table>
+
+<div style="padding-bottom: 5em;">
+
+</div>
+
+
+
+
+
+
+
+
+    {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
+
+{% endblock %}

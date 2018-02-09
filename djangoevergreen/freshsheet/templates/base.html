@@ -23,6 +23,7 @@
     {% endblock %}
 
     <!--CSS-->
+    {% block css %}
     <style type="text/css">
 
 
@@ -39,46 +40,64 @@
             text-align: center;
         }
 
+        /* Remove number-spin in number fields */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
-
+    {% endblock %}
 
 </head>
-{% block background %}
-    <body>
+<body>
 
 
-    <div class="ui secondary menu">
-        <a href="/" class="item {% if request.path == '/' %}active{% endif %}">
-            Fresh Sheet Index
-        </a>
-        <a href="/admin" class="item">
-            Admin
-        </a>
-        <a href="/cart" class="item">
-            Cart
-        </a>
-        <div class="right menu">
-            <div class="item">
-                <div class="ui icon input">
-                    <input type="text" placeholder="Search...">
-                    <i class="search link icon"></i>
-                </div>
+<div class="ui secondary menu">
+    <a href="/" class="item {% if request.path == '/' %}active{% endif %}">
+        Fresh Sheet Index
+    </a>
+    <a href="/admin" class="item">
+        Admin
+    </a>
+    <a href="/cart" class="item">
+        Cart
+        {% if request.user.cart %}
+            (${{ request.user.cart.order_total_cost }})
+        {% endif %}
+    </a>
+    <div class="right menu">
+        <div class="item">
+            <div class="ui icon input">
+                <input type="text" placeholder="Search...">
+                <i class="search link icon"></i>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="ui container">
+<div class="ui container">
 
-        {% block content %}
-        {% endblock %}
+    {% block content %}
+    {% endblock %}
 
-    </div>
+</div>
 
-    </body>
-{% endblock %}
+</body>
 <script>
     $(document).ready(function () {
         //$('.menu .item').tab()
+        $('.ui.form')
+            .form({
+                fields: {
+                    quantity     : 'empty'
+                }
+            })
     })
+
+
 </script>
 </html>

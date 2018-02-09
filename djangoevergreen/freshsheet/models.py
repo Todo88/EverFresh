@@ -55,8 +55,6 @@ class Farm(models.Model):
         default='',
     )
 
-
-
     # Example: ('WA', 'Washington')
     STATE = (('AL', 'Alabama'),
              ('AZ', 'Arizona'),
@@ -126,22 +124,6 @@ class Farm(models.Model):
         return self.name
 
 # ------------------------------------------------------------------------------
-# Category Input
-# ------------------------------------------------------------------------------
-
-
-# class Category(models.Model):
-#
-#     name = models.CharField(
-#         max_length=50,
-#         default='',
-#     )
-#
-#     def __str__(self):
-#         return str(self.name)
-
-
-# ------------------------------------------------------------------------------
 # FoodItem Database Input
 # ------------------------------------------------------------------------------
 
@@ -205,7 +187,6 @@ class FoodItem(models.Model):
         default='',
     )
 
-
     # Example: ('LB', 'Pounds'),
     UNIT = (('LB', 'Pound(s)'),
             ('BU', 'Bundle'),
@@ -216,7 +197,7 @@ class FoodItem(models.Model):
     unit = models.CharField(
         max_length=15,
         choices=UNIT,
-        default=('LB', 'Pounds'),
+        default=('LB', 'Pound(s)'),
         null=False,
         blank=False,
     )
@@ -284,50 +265,67 @@ class FreshSheet(models.Model):
         return str(self.created_at)
 
 # ------------------------------------------------------------------------------
-# Cart Input
+# Order Model
 # ------------------------------------------------------------------------------
 
 
 class OrderItem(models.Model):
-    user = models.ForeignKey('User', on_delete=models.PROTECT)
-    active = models.BooleanField()
-    item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name="items")
+    item = models.ForeignKey(FoodItem, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=7, decimal_places=2)
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='items')
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    @property
+    def total_cost(self):
+        return self.price * self.quantity
+
+    def get_unit_verbose(self):
+        if self.item.unit == 'LB' and self.quantity >= 2:
+            return "Pounds"
+        if self.item.unit == 'LB' and self.quantity == 1:
+            return "Pound"
+        if self.item.unit == 'BU' and self.quantity >= 2:
+            return "Bundles"
+        if self.item.unit == 'BU' and self.quantity == 1:
+            return "Bundle"
+        if self.item.unit == 'HD' and self.quantity >= 2:
+            return "Heads"
+        if self.item.unit == 'HD' and self.quantity == 1:
+            return "Head"
+        if self.item.unit == 'C':
+            return "Count"
 
 
 class Order(models.Model):
+    created_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
+    order_date = models.DateField('Date', auto_now_add=True)
+    status = models.CharField(
+        max_length=40,
+        null=False,
+        blank=False,
+        default='Shopping',
+        choices=(
+            ('P', 'Pending'),
+            ('C', 'Complete'),
+            ('O', 'Out For Delivery'),
+            ('D', 'Delivered')
+        ))
 
-    order_id = models.PositiveIntegerField(
-        "Order Number",
-        null=True,
-        default=None,
-        unique=True,
-    )
-
-    # def order_total(self, cart, request):
-    #     order_total = 0
-    #     for OrderItem.item in cart:
-    #         OrderItem.price += order_total
-    #
-    #     sum(OrderItem.price, self).order_total(cart, request)
-    #
-    # def populate_from_cart(self, cart, request):
-    #     super(Order, self).populate_from_cart(cart, request)
     @property
-    def price(self):
-        return sum([i.price for i in self.items.all()])
+    def order_total_cost(self):
+        total_cost = 0
+        for item in self.items.all():
+            total_cost += item.quantity * item.price
+        return total_cost
+
+    def __str__(self):
+        return 'Order #' + str(self.pk)
+
 
 # ------------------------------------------------------------------------------
-# User Override
+# User Model
 # ------------------------------------------------------------------------------
 
 
-class User(AbstractUser):
-
-    class Meta(AbstractUser.Meta):
-        swappable = 'AUTH_USER_MODEL'
-
+class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-
