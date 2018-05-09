@@ -66,7 +66,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'djangoevergreen.urls'
 
 # Data stored in secret_settings.py
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'a-secret-key')
 
 
 # Pull os.getenv data from direnv.
@@ -74,16 +74,26 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Databases for Heroku Postgresql
 
 # Default database for local dev
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+DB_HOST = os.getenv('DB_HOST')
+if DB_HOST:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST', ''),
+            'PORT': os.getenv('DB_PORT', ''),
+        }
     }
-}
+else:
+    # We're on local without any env, let's just do sqlite for quick testing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'database.sqlite3',
+        }
+    }
 
 # Overrides database with Heroku settings, if we're on heroku and not local
 db_from_env = dj_database_url.config(conn_max_age=500)
