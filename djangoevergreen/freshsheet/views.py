@@ -10,8 +10,16 @@ from .models import FreshSheet, Order, FoodItem, OrderItem
 
 
 def home(request):
+    cart_quantities = {}
+
+    if request.user.cart:
+        for line_item in request.user.cart.items.all():
+            # Need to make the key a str here so in the template we can access it from the str version of pk
+            cart_quantities[str(line_item.item.pk)] = line_item.quantity
+
     return render(request, 'freshsheet/home.html', {
-        "freshsheet": FreshSheet.objects.last()
+        "freshsheet": FreshSheet.objects.last(),
+        "cart_quantities": cart_quantities,
     })
 
 
@@ -45,19 +53,8 @@ def details(request, id):
 
 @login_required
 def cart(request):
-    # line_items = request.user.cart.items.all()
-    #
-    # for line_item in line_items:
-    #     line_item.total_cost = line_item.price * line_item.quantity
-    #
-    # # for line_item in line_items:
-    # #     line_item.cart_total += line_item.total_cost
-    #
-    # context = {
-    #     # 'cart': request.user.cart,
-    #     'line_items': line_items
-    # }
-
+    # NOTE: We don't need any context here because request.user.cart has all of the functions
+    # and data we need
     return render(request, 'freshsheet/cart.html')
 
 
