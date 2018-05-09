@@ -2,25 +2,96 @@
 
 {% block content %}
 
-<!-- CSS -->
+    <!-- CSS -->
+    <style>
+        #qty_id {
+            text-align: right;
+        }
 
-<!--Page Title-->
+        h1 {
+            alignment: center;
+        }
 
-<h1 style="alignment: center;"> {{ freshsheet.created_at }} Fresh Sheet </h1>
+        #product_name {
+            font-weight: normal;
+        }
 
-<!--Menu-->
+        .food_item_row:hover {
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .item.ui.segment:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+        input#qty_id:focus {
+            background-color: rgba(0, 255, 28, 0.06);
+            border-color: rgba(41, 67, 32, 0.44);
+        }
+    </style>
+    <!--Page Title-->
 
-<div class="ui top attached tabular menu">
-    <a class="active item" data-tab="first">Fresh Sheet</a>
-    <a class="item" data-tab="second">List View</a>
-</div>
+    <h1> {{ freshsheet.created_at }} Fresh Sheet </h1>
 
-<!--Fresh Sheet-->
-<div class="ui bottom attached active tab segment" data-tab="first">
-    <div class="ui link items">
-        <div class="ui doubling grid">
-            {% for food_item in freshsheet.items.all|dictsort:"name" %}
-            <div class="box seven wide mobile five wide tablet four wide computer column">
+    <!--Menu-->
+
+    <div class="ui top attached tabular menu">
+        <a class="active item" data-tab="first">List View</a>
+        <a class="item" data-tab="second">Fresh Sheet</a>
+    </div>
+
+    <!--List View-->
+    <div class="ui bottom attached active tab segment" data-tab="first">
+        <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
+            {% csrf_token %}
+            <table class="ui compact celled definition table">
+                <thead class="full-width">
+                <tr>
+                    <th class="ten wide left aligned">Product</th>
+                    <th class="four wide right aligned">Quantity</th>
+                    <th class="two wide right aligned">Price Per Unit</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for food_item in freshsheet.items.all|dictsort:"name" %}
+                    <tr onclick="$(this).find('input').focus()" class="food_item_row">
+                        <td id="product_name">
+                            {{ food_item.name }}
+                        </td>
+                        <td class="right aligned">
+                            <div class="field">
+                                <div class="ui fluid input">
+                                    <input type="number" id="qty_id" name="food_item_{{ food_item.pk }}"
+                                           placeholder="{{ food_item.get_unit_verbose }}">
+                                </div>
+                            </div>
+                    </div>
+                    </td>
+                    <td class="right aligned">${{ food_item.price }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot class="full-width">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>
+                            <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
+                                Add to Cart
+                            </button>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+
+    <!--Fresh Sheet-->
+    <div class="ui bottom attached tab segment" data-tab="second">
+        <div class="ui link items">
+            <div class="ui doubling grid">
+                {% for food_item in freshsheet.items.all|dictsort:"name" %}
+                    <div class="box seven wide mobile five wide tablet four wide computer column">
                     <span class="v_modal_button" foodsheet-modal-id="#food_modals_{{ food_item.pk }}">
                         <div class="item ui segment">
                             <span class="ui center align centered instant fade reveal">
@@ -30,82 +101,86 @@
                                 </span>
                                 </span>
                             </span>
-                <div class="ui divider"></div>
-                <div class="center aligned header"
-                     style="font-weight: bold; text-align: center;">{{ food_item.name }}
-                </div>
-            </div>
-            </span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-</div>
-
-<!--List View-->
-
-<div class="ui bottom attached tab segment" data-tab="second">
-    <div class="ui divided selection list">
-
-        {% for food_item in freshsheet.items.all %}
-        <div class="item">
-                    <span class="v_modal_button" foodsheet-modal-id="#food_modals_{{ food_item.pk }}">
-                    <div class="ui grid">
-                        <h4 class="five wide left aligned column">
-                            <span style="text-decoration-color: black;">{{ food_item.name }}
-                            </span>
-                        </h4>
+                        <div class="ui divider"></div>
+                        <div class="center aligned header"
+                             style="font-weight: bold; text-align: center;">{{ food_item.name }}
+                        </div>
                     </div>
                     </span>
+                    </div>
+                {% endfor %}
         </div>
-        {% endfor %}
-
     </div>
-</div>
+    </div>
 
 
-{% for food_item in freshsheet.items.all %}
-<div id="food_modals_{{ food_item.pk }}" class="ui modal">
-    <i class="close icon"></i>
-    <div class="header">
-        {{ food_item.name }} from {{ food_item.farm.name }}
-    </div>
-    <div class="ui left aligned content">
-        <img style="width: 200px; height: 200px;" class="ui rounded image" src='/media/{{ food_item.image }}'>
-        <div class="ui">{{ food_item.description }}</div>
-    </div>
-    <div class="actions">
-        <div class="ui black deny button">
-            Cancel
+
+    {#    <div class="ui bottom attached tab segment" data-tab="second">#}
+    {#        <div class="ui divided list">#}
+    {#            {% for food_item in freshsheet.items.all %}#}
+    {#                <div class="item">#}
+    {#                    <div class="ui grid">#}
+    {#                        <h4 class="five wide left aligned column">#}
+    {#                            <span style="color: black;">{{ food_item.name }}#}
+    {#                            </span>#}
+    {#                        </h4>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            {% endfor %}#}
+    {#        </div>#}
+    {#    </div>#}
+
+    <!-- Modals -->
+    {% for food_item in freshsheet.items.all %}
+        <div id="food_modals_{{ food_item.pk }}" class="ui modal">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ food_item.name }} from {{ food_item.farm.name }}
+            </div>
+            <div class="ui left aligned content">
+                <img style="width: 200px; height: 200px;" class="ui rounded image" src='/media/{{ food_item.image }}'>
+                <div class="ui">{{ food_item.description }}</div>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui input">
+                    <input type="number" id="qty_id"
+                           placeholder="{{ food_item.get_unit_verbose }} of {{ food_item.name }}">
+                </div>
+                <button data-item-id="{{ food_item.pk }}" name="itemId"
+                        class="order-button ui negative right labeled icon button">
+                    Order {{ food_item.name }}
+                    <i class="shop icon"></i>
+                </button>
+            </div>
         </div>
-        <div class="ui input">
-            <input type="text" name="units" placeholder="{{ food_item.unit }} of {{ food_item.name }}">
-        </div>
-        <a href="{% url 'add_to_cart' food_item.pk 1 %}?freshsheet_pk={{ freshsheet.pk }}" class="ui negative right labeled icon button">
-            Order {{ food_item.name }}
-            <i class="shop icon"></i>
-        </a>
+    {% endfor %}
+
+    <script>
+
+        $(document).ready(function () {
+            $('.menu .item').tab()
+            $('.v_modal_button').click(function () {
+                //$('.ui.modal').modal('show')
+                var modal_id = $(this).attr('foodsheet-modal-id')
+                $(modal_id).modal('show')
+                $(".order-button").click(function (event) {
+                    // your add_quantity function stuff here
+                    var quantity = $(event.target).parent().find('input').val()
+                    $.get("/add_to_cart/" + this.dataset.itemId + "/" + quantity + "/" + "?freshsheet_pk={{ freshsheet.pk }}")
+                })
+            })
+        });
+    </script>
+
+    <header></header>
+
+    <p></p>
+    <button class="ui button">
+        <a href="/">Back to Index</a>
+    </button>
+    <div style="padding-bottom:10em;">
     </div>
-</div>
-{% endfor %}
-
-<script>
-    $(document).ready(function () {
-        $('.menu .item').tab()
-        $('.v_modal_button').click(function () {
-            //$('.ui.modal').modal('show')
-            var modal_id = $(this).attr('foodsheet-modal-id')
-            $(modal_id).modal('show')
-        })
-    })
-</script>
-
-<header></header>
-
-<p></p>
-<button class="ui button">
-    <a href="/">Back to Index</a>
-</button>
-<div style="padding-bottom:10em;">
-</div>
 {% endblock %}

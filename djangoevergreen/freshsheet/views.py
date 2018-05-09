@@ -9,6 +9,10 @@ from django.template import loader
 from .models import FreshSheet, Order, FoodItem, OrderItem
 
 
+def home(request):
+    return render(request, 'freshsheet/home.html')
+
+
 def index(request):
     # return HttpResponse("You're at the Fresh Sheet index.")
 
@@ -51,40 +55,47 @@ def cart(request):
     return render(request, 'freshsheet/cart.html')
 
 
-@login_required
-def add_to_cart(request, item_pk, quantity):
-    # You want this in the future to prevent someone from sending a GET request to add an item
-    # if request.method is not 'POST':
-    #     raise Http404()
+def _add_to_cart(user, item_pk, quantity):
 
     # Example checks:
     #  - Is the FoodItem expired, maybe? do we have enough quantity to even sell it?
     #  - Is the quantity given > 0?
 
     # first get the cart, and make one if it doesn't exist
-    if not request.user.cart:
-        request.user.cart = Order.objects.create(status='Pending', created_by=request.user)
-        request.user.save()
+    if not user.cart:
+        user.cart = Order.objects.create(status='Pending', created_by=user)
+        user.save()
+
     try:
-        item_detail_in_cart = request.user.cart.items.filter(item__id=item_pk)
+        item_detail_in_cart = user.cart.items.filter(item__id=item_pk)
         if item_detail_in_cart:
             item_detail_in_cart[0].quantity += quantity
             item_detail_in_cart[0].save()
         else:
             food_item = FoodItem.objects.get(pk=item_pk)
             OrderItem.objects.create(
-                order=request.user.cart,
+                order=user.cart,
                 item=food_item,
                 price=food_item.price,
                 quantity=quantity
             )
-
-        # return '{"total_cost": {}}'.format(request.user.cart.total_cost())
-        print(request.GET.get('freshsheet_pk'))
-        return redirect(reverse('details', args=[request.GET.get('freshsheet_pk')]))
+        return True
 
     except ObjectDoesNotExist:
-        raise Http404()
+        return False
+
+
+@login_required
+def add_to_cart_view(request, item_pk, quantity):
+    # You want this in the future to prevent someone from sending a GET request to add an item
+    # if request.method is not 'POST':
+    #     raise Http404()
+    result = _add_to_cart(request.user, item_pk, quantity)
+    if result:
+        return HttpResponse()
+    else:
+        raise Http404
+
 
 
 @login_required
@@ -172,8 +183,31 @@ def invoice(request, order_pk):
         return Http404()
 
 
+@login_required()
+def add_line_items_to_cart(request):
+    """
+    What we're going to receive:
+        form_elements is our list of elements (maybe in request.POST?)
 
+        for element in form_elements:
+            food_item_pk = element.name.split("food_item_")[1]
+            food_item = FoodItem.objects.get(pk=food_item_pk)
+            new_line_item = LineItem.objects.create(food_item=food_item, quantity=element.value)
+            request.user.cart.items.add(new_line_item)
+    """
 
+    print(request.POST)
+
+    for name, value in request.POST.items():
+        try:
+            value = int(value)
+        except ValueError:
+            continue
+        if "food_item_" in name and value:
+            food_item_pk = name.split("food_item_")[1]
+            _add_to_cart(request.user, food_item_pk, value)
+
+    return HttpResponseRedirect(reverse('cart'))
 
 
 

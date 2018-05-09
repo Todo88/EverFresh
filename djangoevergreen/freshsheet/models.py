@@ -214,6 +214,16 @@ class FoodItem(models.Model):
         decimal_places=2,
     )
 
+    def get_unit_verbose(self):
+        if self.unit == 'LB':
+            return "Pounds"
+        if self.unit == 'BU':
+            return "Bundles"
+        if self.unit == 'HD':
+            return "Heads"
+        if self.unit == 'C':
+            return "Count"
+
     def __str__(self):
         return self.name
 

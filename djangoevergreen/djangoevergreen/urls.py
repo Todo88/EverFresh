@@ -21,10 +21,10 @@ from django.conf import settings
 
 
 urlpatterns = [
+    url(r'^accounts/', include('registration.backends.default.urls')),
     path('', include('freshsheet.urls')),
     # url(r'freshsheet/', include('freshsheet.urls')),
     path(r'admin/', admin.site.urls),
-
 ]
 
 if settings.DEBUG:

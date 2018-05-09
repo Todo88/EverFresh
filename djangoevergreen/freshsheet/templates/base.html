@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    {% block meta %}
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    {% endblock %}
     <title>{% block title %}Fresh Sheet{% endblock %}</title>
 
 
@@ -23,14 +24,12 @@
     {% endblock %}
 
     <!--CSS-->
-    {% block css %}
+
     <style type="text/css">
-
-
-
         /* Padding for Title */
         body {
             background-color: rgba(212, 208, 208, 0.23);
+            margin: 0 auto;
         }
 
         /* Make Vegetable names more easily readable in table */
@@ -46,46 +45,183 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+        #header_logo img {
+            width: 20em;
+            margin-left: 2em;
+        }
+
+        .ui.secondary.menu .active.item {
+            background: none !important;
+            font-weight: bold;
+            border-radius: 0;
+        }
+
+        .ui.secondary.menu .active.item::after {
+            border-radius: 0;
+            font-weight: bold;
+            padding-bottom: 2px;
+            border-bottom: 3px solid rgb(95, 148, 68);
+            display: block;
+            width: 100%;
+            background: transparent;
+        }
+
+        .ui.secondary.menu .active.item:hover::after {
+
+        }
+
+        .ui.secondary.menu a.item {
+            border-radius: 0;
+            border-bottom: 3px solid transparent;
+            display: inline-block;
+            background: transparent;
+        }
+
+        .ui.secondary.menu a.item::after {
+            content: '';
+            transition: 0.3s ease-in-out;
+            border-radius: 0;
+            font-weight: bold;
+            width: 0;
+            border-bottom: 3px solid transparent;
+            display: block;
+            padding-bottom: 2px;
+            background: transparent;
+        }
+
+        .ui.secondary.menu a.item:hover {
+            background: none;
+            font-weight: bold;
+        }
+
+        .ui.secondary.menu a.item:hover::after {
+            border-radius: 0;
+            font-weight: bold;
+            padding-bottom: 2px;
+            border-bottom: 3px solid rgb(95, 148, 68);
+            display: block;
+            width: 100%;
+            background: transparent;
+        }
+
+        #spacer {
+            width: 55%;
+        }
+
+        .sm.item {
+            display: block;
+        }
+
+        .ui.link.list a.item {
+            transition: unset;
+        }
+
+        .sm.item:hover .instagram.icon {
+            color: #cd486b;
+            text-align: center;
+        }
+
+        a.sm.item:hover .facebook.f.icon {
+            background: #3B5998;
+            border-radius: 1px;
+            height: 15px;
+            text-align: center;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .wrapper {
+            min-height: 99%;
+            margin: 0 20px -260px 20px;
+        }
+
+        .footer, .push {
+            height: 260px;
+            margin: 0 15%;
+        }
+
+        {% block css %}
+        {% endblock %}
     </style>
-    {% endblock %}
 
 </head>
-<body>
-
-
-<div class="ui secondary menu">
-    <a href="/" class="item {% if request.path == '/' %}active{% endif %}">
-        Fresh Sheet Index
-    </a>
-    <a href="/admin" class="item">
-        Admin
-    </a>
-    <a href="/cart" class="item">
-        Cart
-        {% if request.user.cart %}
-            (${{ request.user.cart.order_total_cost }})
+<div class="wrapper">
+    <div class="ui right secondary menu">
+        <a id="header_logo" href="/"><img src="../../static/images/Logo/eufoodhub.png"/>
+        </a>
+        <div id="spacer"></div>
+        <a id="index_link" href="/index" class="item ease {% if request.path == '/index/' %}active{% endif %}">
+            Fresh Sheet Index
+        </a>
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <a href="/admin" class="item ease">
+                Admin
+            </a>
         {% endif %}
-    </a>
-    <div class="right menu">
-        <div class="item">
-            <div class="ui icon input">
-                <input type="text" placeholder="Search...">
-                <i class="search link icon"></i>
-            </div>
-        </div>
+        <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
+            Cart
+            {% if request.user.cart %}
+                (${{ request.user.cart.order_total_cost }})
+            {% endif %}
+        </a>
+    </div>
+
+    <div class="ui container">
+
+        {% block content %}
+        {% endblock %}
+
     </div>
 </div>
 
-<div class="ui container">
+<div class="push"></div>
+<footer>
+    <div class="ui inverted vertical footer segment">
+        <div class="ui center aligned container">
+            <div class="ui stackable inverted divided grid">
+                <div class="three wide column">
+                    <h4 class="ui inverted header">Group 1</h4>
+                    <div class="ui inverted link list">
+                        <a href="#" class="item">Link One</a>
+                        <a href="#" class="item">Link Two</a>
 
-    {% block content %}
-    {% endblock %}
-
-</div>
-
+                    </div>
+                </div>
+                <div class="three wide column">
+                    <h4 class="ui inverted header">Group 2</h4>
+                    <div class="ui inverted link list">
+                        <a href="#" class="item">Link One</a>
+                    </div>
+                </div>
+                <div class="three wide column">
+                    <h4 class="ui inverted header">Social Media</h4>
+                    <div class="ui inverted link list">
+                        <div><a href="https://www.instagram.com/evergreenunitedfoodhub/" class="sm item"><i
+                                class="instagram icon"></i> Instagram</a></div>
+                        <div><a href="https://www.facebook.com/evergreenunitedfoodhub/" class="sm item"><i
+                                class="facebook f icon"></i> Facebook</a></div>
+                    </div>
+                </div>
+                <div class="seven wide column">
+                    <h4 class="ui inverted header">Good food. Grown, prepared and enjoyed within 100 miles of
+                        Seattle.</h4>
+                    <p>Evergreen United Food Hub connects the Puget Sound's most pioneering chefs and farmers, pushing
+                        the boundaries of seasonality and diversity in the PNW while providing consistent local food
+                        service and emboldening our community foodshed. </p>
+                </div>
+            </div>
+            <div class="ui inverted section divider"></div>
+            <img src="../../static/images/Logo/EvergreenLogo.png" class="ui centered tiny image">
+        </div>
+    </div>
+</footer>
 </body>
 <script>
     $(document).ready(function () {
@@ -93,7 +229,7 @@
         $('.ui.form')
             .form({
                 fields: {
-                    quantity     : 'empty'
+                    quantity: 'empty'
                 }
             })
     })
