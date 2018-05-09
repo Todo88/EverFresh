@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', True))
 
-# ALLOWED_HOSTS = ['everfresh.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 # SendGrid Email Settings
 EMAIL_HOST = os.getenv('EMAIL_HOST')
