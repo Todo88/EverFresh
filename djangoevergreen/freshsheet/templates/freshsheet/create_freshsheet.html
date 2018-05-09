@@ -5,6 +5,15 @@
         .ui.form {
             margin: 2%;
         }
+
+        .ui.checkbox {
+            display: flex;
+            margin-top: 10px;
+        }
+        div.inline.field {
+            display: flex;
+            margin-top: 5px;
+        }
     </style>
     <h1>Create Freshsheet</h1>
     <div class="ui table">
@@ -13,44 +22,55 @@
                 <label>Header Message to Chefs</label>
                 <textarea></textarea>
             </div>
-            <div class="inline field">
-                <label>Select Vegetables for Freshsheet</label>
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
+            <div class="grouped fields">
+                <div class="inline field">
+                    <label>Select Vegetables for Freshsheet</label>
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" tabindex="0" class="hidden">
+                        <label>Checkbox</label>
+                    </div>
                 </div>
             </div>
-            <div class="inline field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
-                </div>
-            </div>
-            <div class="inline field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
-                </div>
-            </div>
-            <div class="inline field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
-                </div>
-            </div>
-            <div class="inline field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
-                </div>
-            </div>
-            <div class="inline field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>Checkbox</label>
-                </div>
-            </div>
-
+            <button class="ui right pushed button">Submit Freshsheet</button>
         </div>
+    </div>
 
+    <script>
+
+        $(document).ready(function () {
+            $('.ui.checkbox')
+                .checkbox()
+            ;
+        })
+    </script>
 {% endblock %}
