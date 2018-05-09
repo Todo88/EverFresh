@@ -54,6 +54,9 @@
             width: 20em;
             margin-left: 2em;
         }
+        .ui.secondary.menu {
+            margin: 0 5%;
+        }
 
         .ui.secondary.menu .active.item {
             background: none !important;
@@ -109,10 +112,6 @@
             background: transparent;
         }
 
-        #spacer {
-            width: 55%;
-        }
-
         .sm.item {
             display: block;
         }
@@ -147,30 +146,41 @@
             margin: 0 15%;
         }
 
+        #menu_items {
+            justify-content: flex-end;
+            display: flex;
+            width:100%;
+        }
+
         {% block css %}
         {% endblock %}
     </style>
 
 </head>
 <div class="wrapper">
-    <div class="ui right secondary menu">
+    <div class="ui secondary menu">
         <a id="header_logo" href="/"><img src="../../static/images/Logo/eufoodhub.png"/>
         </a>
-        <div id="spacer"></div>
-        <a id="index_link" href="/index" class="item ease {% if request.path == '/index/' %}active{% endif %}">
-            Fresh Sheet Index
-        </a>
-        {% if request.user.is_staff or request.user.is_superuser %}
-            <a href="/admin" class="item ease">
-                Admin
-            </a>
-        {% endif %}
-        <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
-            Cart
-            {% if request.user.cart %}
-                (${{ request.user.cart.order_total_cost }})
+
+        <div id="menu_items">
+            {% if request.user.is_staff or request.user.is_superuser %}
+                <a href="/create_freshsheet" class="item ease">
+                    Create Freshsheet
+                </a>
+                <a href="/admin" class="item ease">
+                    Admin
+                </a>
             {% endif %}
-        </a>
+            <a id="index_link" href="/index" class="item ease {% if request.path == '/index/' %}active{% endif %}">
+                Fresh Sheet Index
+            </a>
+            <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
+                Cart
+                {% if request.user.cart %}
+                    (${{ request.user.cart.order_total_cost }})
+                {% endif %}
+            </a>
+        </div>
     </div>
 
     <div class="ui container">

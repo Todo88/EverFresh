@@ -7,7 +7,7 @@
 #     url(r'^details/(?P<id>\d+)/$', views.details, name='details'),
 # ]
 
-from django.urls import path
+from django.urls import path, include
 from django.conf.urls import url
 
 from django.conf import settings
@@ -26,6 +26,8 @@ urlpatterns = [
     path('update_cart/', views.update_cart, name='update_cart'),
     path('checkout/', views.checkout, name='checkout'),
     path('invoice/<int:order_pk>/', views.invoice, name='invoice'),
+    path('^accounts/', include('registration.backends.default.urls')),
+    path('create_freshsheet/', views.create_freshsheet, name="create_freshsheet")
 ]
 
 if settings.DEBUG:

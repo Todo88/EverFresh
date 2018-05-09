@@ -335,7 +335,5 @@ class Order(models.Model):
 # ------------------------------------------------------------------------------
 # User Model
 # ------------------------------------------------------------------------------
-
-
 class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)

@@ -10,7 +10,13 @@ from .models import FreshSheet, Order, FoodItem, OrderItem
 
 
 def home(request):
-    return render(request, 'freshsheet/home.html')
+    return render(request, 'freshsheet/home.html', {
+        "freshsheet": FreshSheet.objects.last()
+    })
+
+
+def create_freshsheet(request):
+    return render(request, 'freshsheet/create_freshsheet.html')
 
 
 def index(request):

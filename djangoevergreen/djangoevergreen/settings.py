@@ -39,7 +39,6 @@ EMAIL_USE_TLS = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'registration',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,6 +47,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'freshsheet',
+
+    'registration',  # Put registration at the bottom so its templates are overridden
 ]
 
 MIDDLEWARE = [
