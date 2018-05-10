@@ -2,9 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.core.mail import send_mail
 from django.template import loader
+from django.utils import timezone
+from django.views.generic import CreateView, UpdateView
 
 from .models import FreshSheet, Order, FoodItem, OrderItem
 
@@ -21,10 +23,6 @@ def home(request):
         "freshsheet": FreshSheet.objects.last(),
         "cart_quantities": cart_quantities,
     })
-
-
-def create_freshsheet(request):
-    return render(request, 'freshsheet/create_freshsheet.html')
 
 
 def index(request):
@@ -214,4 +212,36 @@ def add_line_items_to_cart(request):
 
 
 
+class FreshSheetFormViewMixin:
+    model = FreshSheet
+    template_name = 'freshsheet/freshsheet_form.html'
+    fields = ['greeting', 'items']
+    success_url = reverse_lazy('home')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get recent and non recent food items by doing opposite queries
+        thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
+        recent_food_items = FoodItem.objects.filter(date_added__gte=thirty_days_ago)
+        non_recent_food_items = FoodItem.objects.exclude(date_added__gte=thirty_days_ago)
+
+        # Add recent items to group
+        context['food_item_groups'] = {
+            'recent': recent_food_items,
+        }
+
+        for item in non_recent_food_items:
+            if not context['food_item_groups'][item.category]:
+                context['food_item_groups'][item.category] = []
+            context['food_item_groups'][item.category].append(item)
+
+        return context
+
+
+class FreshSheetCreateView(FreshSheetFormViewMixin, CreateView):
+    pass
+
+
+class FreshSheetUpdateView(FreshSheetFormViewMixin, UpdateView):
+    pass

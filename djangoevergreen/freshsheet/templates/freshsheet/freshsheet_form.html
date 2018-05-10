@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% load evergreen_helpers %}
+
+{% block content %}
+    <style>
+        .ui.form {
+            margin: 2%;
+        }
+
+        .ui.checkbox {
+            display: flex;
+            margin-top: 10px;
+        }
+        div.inline.field {
+            display: flex;
+            margin-top: 5px;
+        }
+
+        .ui.form .error.message, .ui.form .success.message, .ui.form .warning.message {
+            display: block;
+        }
+    </style>
+    <h1>Create Freshsheet</h1>
+
+    {% if form.errors %}
+    <div class="ui error message">
+        <i class="close icon"></i>
+        {% for field in form %}
+            {% if field.errors %}
+                <strong>{{ field.label }}</strong>
+                <ul>
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form class="ui table {% if form.errors %}error{% endif %}" method="POST" action="">
+        {% csrf_token %}
+        <div class="ui form">
+            <div class="field {% if form.greeting.errors %}error{% endif %}">
+                <label>Header Message to Chefs</label>
+                <textarea name="greeting" required="required">{{ form.greeting.value|default_if_none:'' }}</textarea>
+            </div>
+            <div class="grouped fields">
+                <div class="inline field">
+                    {% for category_name, items in food_item_groups.items %}
+                        <label>{{ category_name|capfirst }}</label>
+                        {% for item in items %}
+                            <div class="ui checkbox">
+                                <input name="items"
+                                       id="food_item_{{ item.pk }}"
+                                       type="checkbox"
+                                       tabindex="0"
+                                       class="hidden"
+                                       value="{{ item.pk }}"
+                                       {% if item in form.initial.items %}checked="checked"{% endif %}>
+                                <label for="food_item_{{ item.pk }}">{{ item }}</label>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="ui right pushed button" type="submit">Submit Freshsheet</button>
+        </div>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            $('.ui.checkbox').checkbox()
+        })
+    </script>
+{% endblock %}

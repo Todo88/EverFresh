@@ -27,7 +27,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('invoice/<int:order_pk>/', views.invoice, name='invoice'),
     path('accounts/', include('registration.backends.default.urls')),
-    path('create_freshsheet/', views.create_freshsheet, name="create_freshsheet")
+    path('create_freshsheet/', views.FreshSheetCreateView.as_view(), name="create_freshsheet"),
+    path('edit_freshsheet/<int:pk>', views.FreshSheetUpdateView.as_view(), name="edit_freshsheet"),
 ]
 
 if settings.DEBUG:

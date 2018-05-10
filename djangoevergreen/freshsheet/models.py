@@ -213,6 +213,7 @@ class FoodItem(models.Model):
         max_digits=8,
         decimal_places=2,
     )
+    date_added = models.DateField(auto_created=True)
 
     def get_unit_verbose(self):
         if self.unit == 'LB':
@@ -266,6 +267,7 @@ class Restaurant(models.Model):
 
 class FreshSheet(models.Model):
 
+    greeting = models.TextField()
     items = models.ManyToManyField(FoodItem)
 
     # Example:
