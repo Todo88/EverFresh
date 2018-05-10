@@ -51,70 +51,81 @@
     <!-- This form is just for updating quantities. We store the cart in request.user
     so we can always access the cart data no problem. We just want to update quantities
     on this page -->
-    <form method="post" action="{% url "update_cart" %}" class="ui form">
-        {% csrf_token %}
-        <table class="ui compact celled definition table">
-            <thead class="full-width">
-            <tr>
-                <th style="font-size: 120%;" class="ten wide left aligned">Product</th>
-                <th style="font-size: 120%;" class="four wide right aligned">Quantity</th>
-                <th style="font-size: 120%;" class="two wide right aligned">Total</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% if request.user.cart.items.all %}
-                {% for line in request.user.cart.items.all %}
-                    <tr>
-                        <td>
-                            {{ line.item }}<br>
-                            <a href="{% url 'remove_from_cart' line_item_pk=line.pk %}"
-                               style="font-size: x-small; font-weight: normal; text-decoration: underline;">
-                                Remove from Cart
-                            </a>
-                        </td>
-                        <td class="right aligned">
-                            <div class="field">
-                                <div class="ui fluid right labeled input">
-                                    <input title="quantity" name="quantity_{{ line.pk }}" type="number" min="1"
-                                           max="9999" class="right aligned"
-                                           value="{{ line.quantity }}">
-                                    <div style="width: 5em;" class="ui right aligned basic label">
-                                        {{ line.get_unit_verbose }}
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="right aligned">${{ line.total_cost }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                <tfoot class="full-width">
-                <tr>
-                    <th></th>
-                    <th>
-                        <button class="tiny ui green fluid button">
-                            Update quantities
-                        </button>
-                    </th>
-                    <th style="font-weight: bold;" class="right aligned">
-                        ${{ request.user.cart.order_total_cost }}
-                    </th>
-                </tr>
-                </tfoot>
-            {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center; font-weight: normal;">
-                        <i>Nothing in cart yet</i>
-                    </td>
-                </tr>
-            {% endif %}
-        </table>
-    </form>
 
-    <a style="margin-top: 1em;" href="{% url 'checkout' %}" class="right floated rounded ui yellow labeled icon button">
-        <i class="cart icon"></i>
-        Checkout
-    </a>
+    <div class="ui grid">
+        <div class="ui row">
+            <div class="centered twelve wide column">
+                <form method="post" action="{% url "update_cart" %}" class="ui form">
+                    {% csrf_token %}
+                    <table class="ui compact unstackable celled definition table">
+                        <thead class="full-width">
+                        <tr>
+                            <th style="font-size: 120%;" class="ten wide left aligned">Product</th>
+                            <th style="font-size: 120%; min-width: 180px;" class="four wide right aligned">Quantity</th>
+                            <th style="font-size: 120%;" class="two wide right aligned">Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if request.user.cart.items.all %}
+                            {% for line in request.user.cart.items.all %}
+                                <tr>
+                                    <td>
+                                        {{ line.item }}<br>
+                                        <a href="{% url 'remove_from_cart' line_item_pk=line.pk %}"
+                                           style="font-size: x-small; font-weight: normal; text-decoration: underline;">
+                                            Remove from Cart
+                                        </a>
+                                    </td>
+                                    <td class="right aligned">
+                                        <div class="field">
+                                            <div class="ui fluid right labeled input">
+                                                <input title="quantity" name="quantity_{{ line.pk }}" type="number"
+                                                       min="1"
+                                                       max="9999" class="right aligned"
+                                                       value="{{ line.quantity }}">
+                                                <div style="width: 5em;" class="ui right aligned basic label">
+                                                    {{ line.get_unit_verbose }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="right aligned">${{ line.total_cost }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot class="full-width">
+                            <tr>
+                                <th></th>
+                                <th>
+                                    <button class="tiny ui green fluid button">
+                                        Update quantities
+                                    </button>
+                                </th>
+                                <th style="font-weight: bold;" class="right aligned">
+                                    ${{ request.user.cart.order_total_cost }}
+                                </th>
+                            </tr>
+                            </tfoot>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" style="text-align: center; font-weight: normal;">
+                                    <i>Nothing in cart yet</i>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </form>
+
+                <a style="margin-top: 1em;" href="{% url 'checkout' %}"
+                   class="right floated rounded ui yellow labeled icon button">
+                    <i class="cart icon"></i>
+                    Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+
+
     {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
 
 {% endblock %}
