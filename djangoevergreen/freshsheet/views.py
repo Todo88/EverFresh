@@ -221,22 +221,32 @@ class FreshSheetFormViewMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get recent and non recent food items by doing opposite queries
-        thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
-        recent_food_items = FoodItem.objects.filter(date_added__gte=thirty_days_ago)
-        non_recent_food_items = FoodItem.objects.exclude(date_added__gte=thirty_days_ago)
+        context['food_item_groups'] = {}
 
-        # Add recent items to group
-        context['food_item_groups'] = {
-            'recent': recent_food_items,
-        }
-
-        for item in non_recent_food_items:
-            if not context['food_item_groups'][item.category]:
+        food_items = FoodItem.objects.all()
+        for item in food_items:
+            if item.category not in context['food_item_groups']:
                 context['food_item_groups'][item.category] = []
             context['food_item_groups'][item.category].append(item)
 
         return context
+
+        # # Get recent and non recent food items by doing opposite queries
+        # thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
+        # recent_food_items = FoodItem.objects.filter(date_added__gte=thirty_days_ago)
+        # non_recent_food_items = FoodItem.objects.exclude(date_added__gte=thirty_days_ago)
+        #
+        # # Add recent items to group
+        # context['food_item_groups'] = {
+        #     'recent': recent_food_items,
+        # }
+        #
+        # for item in non_recent_food_items:
+        #     if not context['food_item_groups'][item.category]:
+        #         context['food_item_groups'][item.category] = []
+        #     context['food_item_groups'][item.category].append(item)
+        #
+        # return context
 
 
 class FreshSheetCreateView(FreshSheetFormViewMixin, CreateView):
