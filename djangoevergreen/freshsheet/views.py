@@ -6,7 +6,8 @@ from django.urls import reverse, reverse_lazy
 from django.core.mail import send_mail
 from django.template import loader
 from django.utils import timezone
-from django.views.generic import CreateView, UpdateView
+from django.utils.decorators import method_decorator
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from .models import FreshSheet, Order, FoodItem, OrderItem
 
@@ -14,37 +15,15 @@ from .models import FreshSheet, Order, FoodItem, OrderItem
 def home(request):
     cart_quantities = {}
 
-    if request.user.cart:
+    if hasattr(request.user, 'cart') and request.user.cart:
         for line_item in request.user.cart.items.all():
             # Need to make the key a str here so in the template we can access it from the str version of pk
             cart_quantities[str(line_item.item.pk)] = line_item.quantity
 
     return render(request, 'freshsheet/home.html', {
-        "freshsheet": FreshSheet.objects.last(),
+        "freshsheet": FreshSheet.objects.filter(published=True).last(),
         "cart_quantities": cart_quantities,
     })
-
-
-def index(request):
-    # return HttpResponse("You're at the Fresh Sheet index.")
-
-    freshsheets = FreshSheet.objects.all()[:10]
-
-    context = {
-        'title': 'Latest Fresh Sheets',
-        'freshsheets': freshsheets,
-    }
-    return render(request, 'freshsheet/index.html', context)
-
-
-def details(request, id):
-    freshsheet = FreshSheet.objects.get(id=id)
-
-    context = {
-        'freshsheet': freshsheet,
-    }
-
-    return render(request, 'freshsheet/details.html', context)
 
 # details must pass database info to call from database in details.html
 
@@ -211,12 +190,59 @@ def add_line_items_to_cart(request):
     return HttpResponseRedirect(reverse('cart'))
 
 
+# -----------------------------------------------------------------------------
+# Freshsheets
+
+
+def list_freshsheets(request):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
+    freshsheets = FreshSheet.objects.all()[:10]
+
+    context = {
+        'title': 'Latest Fresh Sheets',
+        'freshsheets': freshsheets,
+    }
+    return render(request, 'freshsheet/index.html', context)
+
+
+def details(request, id):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
+    freshsheet = FreshSheet.objects.get(id=id)
+
+    context = {
+        'freshsheet': freshsheet,
+    }
+
+    return render(request, 'freshsheet/details.html', context)
+
+
+def publish(request, pk):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
+    freshsheet = FreshSheet.objects.get(pk=pk)
+    if freshsheet.published:
+        return PermissionDenied("Cannot republish a freshsheet!")
+    freshsheet.published = True
+    freshsheet.save()
+    return HttpResponseRedirect(reverse("list_freshsheets"))
+
 
 class FreshSheetFormViewMixin:
     model = FreshSheet
     template_name = 'freshsheet/freshsheet_form.html'
     fields = ['greeting', 'items']
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('list_freshsheets')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff or not request.user.is_superuser:
+            raise PermissionDenied()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -255,3 +281,7 @@ class FreshSheetCreateView(FreshSheetFormViewMixin, CreateView):
 
 class FreshSheetUpdateView(FreshSheetFormViewMixin, UpdateView):
     pass
+
+
+class FreshSheetDeleteView(FreshSheetFormViewMixin, DeleteView):
+    template_name = 'freshsheet/freshsheet_confirm_delete.html'

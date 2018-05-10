@@ -36,6 +36,10 @@
         .ui.form {
             margin-bottom: 10px;
         }
+
+        .disabled {
+            cursor: not-allowed;
+        }
     </style>
     <!--Page Title-->
     <h1> {{ freshsheet.created_at }} Fresh Sheet </h1>
@@ -68,9 +72,13 @@
                                            <!--name="food_item_{{ food_item.pk }}"-->
                                            <!--placeholder="{{ food_item.get_unit_verbose }}">-->
                                 <!--</div>-->
-                                <div class="ui fluid right labeled input">
-                                    <input name="food_item_{{ food_item.pk }}" type="number" min="1"
-                                           max="9999" class="right aligned">
+                                <div class="ui fluid right labeled input {% if not request.user.is_authenticated %}disabled{% endif %}">
+                                    <input name="food_item_{{ food_item.pk }}"
+                                           type="number"
+                                           min="1"
+                                           max="9999"
+                                           {% if not request.user.is_authenticated %}disabled{% endif %}
+                                           class="right aligned">
                                     <div style="width: 5em;" class="ui right aligned basic label">
                                         {{ food_item.get_unit_verbose }}
                                     </div>
@@ -89,9 +97,15 @@
                         <th></th>
                         <th></th>
                         <th>
+                            {% if request.user.is_authenticated %}
                             <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
                                 Add to Cart
                             </button>
+                            {% else %}
+                            <a href="{% url "auth_login" %}" class="tiny ui red fluid button">
+                                You must login
+                            </a>
+                            {% endif %}
                         </th>
                     </tr>
                 </tfoot>

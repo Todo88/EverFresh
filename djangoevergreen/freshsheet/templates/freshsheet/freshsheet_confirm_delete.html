@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="ui middle aligned centered grid">
+        <form action="" method="post" class="ui segment eight wide">
+            {% csrf_token %}
+            <h3>Are you sure you want to delete this freshsheet?</h3>
+            <input type="submit" class="ui button red" value="{% trans 'Confirm deletion' %}" name="confirm_delete"/>
+            <a href="{% url "list_freshsheets" %}" class="ui button">{% trans 'Cancel' %}</a>
+        </form>
+    </div>
+{% endblock %}

@@ -15,6 +15,8 @@ import dj_database_url
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from django.urls import reverse, reverse_lazy
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -184,7 +186,7 @@ REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 
 
 AUTH_USER_MODEL = 'freshsheet.User'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = reverse_lazy("home")
 
 # -----------------------------------------------------------------------------
 # SSL

@@ -46,6 +46,7 @@
                 <label>Header Message to Chefs</label>
                 <textarea name="greeting" required="required">{{ form.greeting.value|default_if_none:'' }}</textarea>
             </div>
+
             <div class="grouped fields">
                 <div class="inline field">
                     {% for category_name, items in food_item_groups.items %}

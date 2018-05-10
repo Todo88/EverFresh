@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.mail import send_mail
 from django.db import models
 from datetime import datetime
 
@@ -7,6 +9,8 @@ from datetime import datetime
 # ------------------------------------------------------------------------------
 # Farms Database Input
 # ------------------------------------------------------------------------------
+from django.template import loader
+from django.utils import timezone
 
 
 class Farm(models.Model):
@@ -272,9 +276,29 @@ class FreshSheet(models.Model):
 
     # Example:
     created_at = models.DateField(default=datetime.now, blank=True)
+    published = models.BooleanField(default=False)
+    published_at = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return str(self.created_at)
+
+    def save(self, **kwargs):
+        if self.published:
+            self.published_at = timezone.now()
+
+            for user in User.objects.all():
+                html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
+
+                send_mail(
+                    'test',
+                    'test content',
+                    user.email,
+                    [settings.DEFAULT_FROM_EMAIL],
+                    fail_silently=False,
+                    html_message=html_message
+                )
+
+        return super().save(**kwargs)
 
 # ------------------------------------------------------------------------------
 # Order Model
