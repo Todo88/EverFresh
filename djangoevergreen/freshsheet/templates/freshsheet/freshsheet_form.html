@@ -12,31 +12,44 @@
             display: flex;
             margin-top: 10px;
         }
+
         div.inline.field {
             display: flex;
-            margin-top: 5px;
+        }
+
+        .three.wide.veggie.column {
+            margin-left: 20px;
         }
 
         .ui.form .error.message, .ui.form .success.message, .ui.form .warning.message {
             display: block;
         }
+
+        #category {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        #left_align {
+            text-align: right;
+        }
     </style>
     <h1>Create Freshsheet</h1>
 
     {% if form.errors %}
-    <div class="ui error message">
-        <i class="close icon"></i>
-        {% for field in form %}
-            {% if field.errors %}
-                <strong>{{ field.label }}</strong>
-                <ul>
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endfor %}
-    </div>
+        <div class="ui error message">
+            <i class="close icon"></i>
+            {% for field in form %}
+                {% if field.errors %}
+                    <strong>{{ field.label }}</strong>
+                    <ul>
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endfor %}
+        </div>
     {% endif %}
 
     <form class="ui table {% if form.errors %}error{% endif %}" method="POST" action="">
@@ -46,11 +59,10 @@
                 <label>Header Message to Chefs</label>
                 <textarea name="greeting" required="required">{{ form.greeting.value|default_if_none:'' }}</textarea>
             </div>
-
-            <div class="grouped fields">
-                <div class="inline field">
-                    {% for category_name, items in food_item_groups.items %}
-                        <label>{{ category_name|capfirst }}</label>
+            <div class="ui table grid">
+                {% for category_name, items in food_item_groups.items %}
+                    <div class="three wide veggie column">
+                        <label id="category">{{ category_name|capfirst }}</label>
                         {% for item in items %}
                             <div class="ui checkbox">
                                 <input name="items"
@@ -63,10 +75,12 @@
                                 <label for="food_item_{{ item.pk }}">{{ item }}</label>
                             </div>
                         {% endfor %}
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
-            <button class="ui right pushed button" type="submit">Submit Freshsheet</button>
+            <div id="left_align">
+                <button id="submit" class="ui button" type="submit">Submit Freshsheet</button>
+            </div>
         </div>
     </form>
 

@@ -80,8 +80,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'a-secret-key')
 # Databases for Heroku Postgresql
 
 # Default database for local dev
-DB_HOST = os.getenv('DB_HOST')
-if DB_HOST:
+DB_NAME = os.getenv('DB_NAME')
+if DB_NAME:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
