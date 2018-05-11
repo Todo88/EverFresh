@@ -74,6 +74,10 @@
             background: transparent;
         }
 
+        .ui.secondary.menu .active.item:hover::after {
+
+        }
+
         .ui.secondary.menu a.item {
             border-radius: 0;
             border-bottom: 3px solid transparent;
@@ -129,6 +133,9 @@
         html, body {
             height: 100%;
         }
+        body {
+            padding-top: 70px;
+        }
 
         .wrapper {
             min-height: 80%;
@@ -158,31 +165,6 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="ui secondary menu">
-        <a id="header_logo" href="/"><img src="{% static "/images/Logo/eufoodhub.png" %}"/>
-        </a>
-
-        <div id="menu_items">
-            {% if request.user.is_staff or request.user.is_superuser %}
-                <a id="index_link" href="{% url "list_freshsheets" %}" class="item ease {% if request.path == '/index/' %}active{% endif %}">
-                    Freshsheets
-                </a>
-                <a href="/admin" class="item ease">
-                    Admin
-                </a>
-            {% endif %}
-            {% if request.user.is_authenticated %}
-                <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
-                    Cart
-                    {% if request.user.cart %}
-                        (${{ request.user.cart.order_total_cost }})
-                    {% endif %}
-                </a>
-                <a href="{% url "logout" %}" class="item ease">Logout?</a>
-            {% endif %}
-        </div>
-    </div>
-
     <div class="ui container">
 
         {% block content %}
@@ -190,7 +172,6 @@
 
     </div>
 </div>
-
 <div class="push"></div>
 <footer>
     <div class="ui inverted vertical footer segment">
@@ -232,19 +213,5 @@
         </div>
     </div>
 </footer>
-
-<script>
-    // $(document).ready(function () {
-    //     //$('.menu .item').tab()
-    //     $('.ui.form')
-    //         .form({
-    //             fields: {
-    //                 quantity: 'empty'
-    //             }
-    //         })
-    // })
-
-
-</script>
 </body>
 </html>
