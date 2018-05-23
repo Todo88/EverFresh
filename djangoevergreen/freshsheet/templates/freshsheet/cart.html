@@ -117,9 +117,9 @@
                 </form>
 
                 <a style="margin-top: 1em;" href="{% url 'checkout' %}"
-                   class="right floated rounded ui yellow labeled icon button">
+                   id="checkout" class="right floated rounded ui yellow labeled icon button">
                     <i class="cart icon"></i>
-                    Checkout
+                    Confirm Order
                 </a>
             </div>
         </div>
@@ -127,6 +127,13 @@
 
 
     {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
+<script>
+$(document).ready(function () {
+    $('#checkout').on('click', function(){
+        confirm('Are you sure you would like to place this order?')
+    })
+})
 
+</script>
 {% endblock %}
 
