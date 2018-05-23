@@ -45,17 +45,21 @@
         <table class="ui compact celled definition table">
             <thead class="full-width">
             <tr>
-                <th class="ten wide left aligned">Product</th>
-                <th class="two wide right aligned">Price Per Unit</th>
+                <th class="six wide left aligned">Product</th>
+                <th class="two wide left aligned">Farm</th>
+                <th class="two wide center aligned">Price</th>
+                <th class="two wide center aligned">Case Price</th>
+                <th class="three wide center aligned">Wholesale Price</th>
             </tr>
             </thead>
             <tbody>
             {% for food_item in freshsheet.items.all|dictsort:"name" %}
                 <tr onclick="$(this).find('input').focus()" class="food_item_row">
-                    <td id="product_name">
-                        {{ food_item.name }}
-                    </td>
+                    <td id="product_name">{{ food_item.name }}</td>
+                    <td id="product_name">{{ food_item.farm }}</td>
                     <td class="right aligned">${{ food_item.price }}</td>
+                    <td class="right aligned">${{ food_item.case_price }}</td>
+                    <td class="right aligned">${{ food_item.wholesale_price }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -72,7 +76,7 @@
         $(document).ready(function () {
             $(".order-button").click(function (event) {
                 // your add_quantity function stuff here
-                var quantity = $(event.target).parent().find('input').val()
+                var quantity = $(event.target).parent().find('input').val();
                 $.get("/add_to_cart/" + this.dataset.itemId + "/" + quantity + "/" + "?freshsheet_pk={{ freshsheet.pk }}")
             })
         });

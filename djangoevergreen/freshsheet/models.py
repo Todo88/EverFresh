@@ -35,7 +35,6 @@ class Farm(models.Model):
                     ('BR', 'brown'),
                     ('G', 'grey'),
                     ('BL', 'black'),
-
                     )
 
     ribbon_color = models.CharField(
@@ -154,40 +153,9 @@ class FoodItem(models.Model):
         max_length=40,
     )
 
-    image = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=''
-
-    )
-
     # Example: A short description of the vegetable.
     description = models.TextField(
         max_length=400,
-        default='',
-    )
-
-    FOOD_COLOR = (('R', 'red'),
-                  ('OR', 'orange'),
-                  ('Y', 'yellow'),
-                  ('OL', 'olive'),
-                  ('GN', 'green'),
-                  ('T', 'teal'),
-                  ('B', 'blue'),
-                  ('V', 'violet'),
-                  ('PU', 'purple'),
-                  ('PI', 'pink'),
-                  ('BR', 'brown'),
-                  ('GR', 'grey'),
-                  ('BL', 'black'),
-                  ('WH', 'white'),
-                  )
-
-    food_color = models.CharField(
-        max_length=20,
-        choices=FOOD_COLOR,
-        null=True,
-        blank=True,
         default='',
     )
 
@@ -214,9 +182,37 @@ class FoodItem(models.Model):
     # Example: 100.00
     price = models.DecimalField(
         default='0.00',
-        max_digits=8,
+        max_digits=5,
         decimal_places=2,
+        verbose_name="Price"
     )
+
+    case_count = models.PositiveIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name="Minimum quantity for case price")
+
+    case_price = models.DecimalField(
+        default=None,
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Case Price"
+    )
+
+    wholesale_count = models.PositiveIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name="Minimum quantity for wholesale price")
+
+    wholesale_price = models.DecimalField(
+        default=None,
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Wholesale Price"
+    )
+
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):
@@ -313,7 +309,12 @@ class OrderItem(models.Model):
 
     @property
     def total_cost(self):
-        return self.price * self.quantity
+        if self.quantity < self.item.case_count:
+            return self.price * self.quantity
+        if self.item.case_count <= self.quantity < self.item.wholesale_count:
+            return self.item.case_price * self.quantity
+        if self.item.wholesale_count <= self.quantity:
+            return self.item.wholesale_price * self.quantity
 
     def get_unit_verbose(self):
         if self.item.unit == 'LB' and self.quantity >= 2:
@@ -351,7 +352,7 @@ class Order(models.Model):
     def order_total_cost(self):
         total_cost = 0
         for item in self.items.all():
-            total_cost += item.quantity * item.price
+            total_cost += item.total_cost
         return total_cost
 
     def __str__(self):
