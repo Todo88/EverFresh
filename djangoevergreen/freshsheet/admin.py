@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
-from .models import FreshSheet, Farm, FoodItem, User, Order, OrderItem
+from .models import FreshSheet, Farm, FoodItem, User, Order, OrderItem, AccountRequest
 
 admin.site.register(FreshSheet)
 admin.site.register(Farm)
@@ -20,5 +20,8 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
 
 
+
+
 admin.site.register(Order, OrderAdmin)
 
+admin.site.register(AccountRequest)

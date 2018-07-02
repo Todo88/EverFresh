@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
 
-from .models import FreshSheet, Order, FoodItem, OrderItem
+from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest
 
 
 def home(request):
@@ -275,6 +275,34 @@ class FreshSheetFormViewMixin:
         # return context
 
 
+# def registration_request(request):
+#     if request.method == 'POST':
+#         form = RequestAccount(request.POST)
+#         if form.is_valid():
+#             return HttpResponseRedirect('/thanks/')
+#     else:
+#         form = RequestAccount()
+#     return render(request, 'registration/registration_request.html', {'form': form})
+#
+
+def thanks(request):
+    return render(request, 'registration/thanks.html')
+
+
+class RequestAccountCreateView(CreateView):
+    model = AccountRequest
+    template_name = 'registration/registration_request.html'
+    fields = [
+        'business_name',
+        'business_address',
+        'customer_name',
+        'customer_position',
+        'phone_number',
+        'email_address'
+    ]
+    success_url = reverse_lazy('thanks')
+
+
 class FreshSheetCreateView(FreshSheetFormViewMixin, CreateView):
     pass
 
@@ -285,3 +313,5 @@ class FreshSheetUpdateView(FreshSheetFormViewMixin, UpdateView):
 
 class FreshSheetDeleteView(FreshSheetFormViewMixin, DeleteView):
     template_name = 'freshsheet/freshsheet_confirm_delete.html'
+
+

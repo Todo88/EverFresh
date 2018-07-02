@@ -26,6 +26,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('invoice/<int:order_pk>/', views.invoice, name='invoice'),
     path('accounts/', include('registration.backends.default.urls')),
+    path('accounts/registration_request', views.RequestAccountCreateView.as_view(), name='registration_request'),
+    path('thanks/', views.thanks, name='thanks'),
 
     # Logout and nicely redirect, normal logout does not redirect
     url(r'logout/', logout, {'next_page': settings.LOGIN_REDIRECT_URL}, name='logout'),

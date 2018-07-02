@@ -360,7 +360,19 @@ class Order(models.Model):
 
 
 # ------------------------------------------------------------------------------
-# User Model
+# Users
 # ------------------------------------------------------------------------------
 class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+class AccountRequest(models.Model):
+    business_name = models.CharField(verbose_name='Business Name', max_length=40)
+    business_address = models.CharField(verbose_name='Business Address', max_length=75)
+    customer_name = models.CharField(verbose_name='Customer Name', max_length=50)
+    customer_position = models.CharField(verbose_name='Job Title', max_length=20)
+    phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
+    email_address = models.EmailField(verbose_name='Email', max_length=50)
+
+    def __str__(self):
+        return self.business_name
