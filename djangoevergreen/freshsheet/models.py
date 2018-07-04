@@ -157,19 +157,20 @@ class FoodItem(models.Model):
     description = models.TextField(
         max_length=400,
         default='',
+        blank=True,
+        null=True,
     )
 
     # Example: ('LB', 'Pounds'),
-    UNIT = (('LB', 'Pound(s)'),
-            ('BU', 'Bundle'),
-            ('HD', 'Head'),
-            ('C', 'Count'),
-            )
+    # UNIT = (('lb', 'Pound(s)'),
+    #         ('bu', 'Bundle'),
+    #         ('hd', 'Head'),
+    #         ('c', 'Count'),
+    #         )
 
     unit = models.CharField(
         max_length=15,
-        choices=UNIT,
-        default=('LB', 'Pound(s)'),
+        default='lb',
         null=False,
         blank=False,
     )
@@ -178,6 +179,7 @@ class FoodItem(models.Model):
     quantity = models.PositiveIntegerField(
         default=0,
         null=True,
+        blank=True,
     )
 
     # Example: 100.00
@@ -197,6 +199,7 @@ class FoodItem(models.Model):
     case_price = models.DecimalField(
         default=None,
         null=True,
+        blank=True,
         max_digits=5,
         decimal_places=2,
         verbose_name="Case Price"
@@ -211,6 +214,7 @@ class FoodItem(models.Model):
     wholesale_price = models.DecimalField(
         default=None,
         null=True,
+        blank=True,
         max_digits=5,
         decimal_places=2,
         verbose_name="Wholesale Price"
@@ -235,13 +239,13 @@ class FoodItem(models.Model):
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):
-        if self.unit == 'LB':
+        if self.unit == 'lb':
             return "Pounds"
-        if self.unit == 'BU':
+        if self.unit == 'bu':
             return "Bundles"
-        if self.unit == 'HD':
+        if self.unit == 'hd':
             return "Heads"
-        if self.unit == 'C':
+        if self.unit == 'c':
             return "Count"
 
     def __str__(self):
@@ -336,19 +340,19 @@ class OrderItem(models.Model):
             return self.item.wholesale_price * self.quantity
 
     def get_unit_verbose(self):
-        if self.item.unit == 'LB' and self.quantity >= 2:
+        if self.item.unit == 'lb' and self.quantity >= 2:
             return "Pounds"
-        if self.item.unit == 'LB' and self.quantity == 1:
+        if self.item.unit == 'lb' and self.quantity == 1:
             return "Pound"
-        if self.item.unit == 'BU' and self.quantity >= 2:
+        if self.item.unit == 'bu' and self.quantity >= 2:
             return "Bundles"
-        if self.item.unit == 'BU' and self.quantity == 1:
+        if self.item.unit == 'bu' and self.quantity == 1:
             return "Bundle"
-        if self.item.unit == 'HD' and self.quantity >= 2:
+        if self.item.unit == 'hd' and self.quantity >= 2:
             return "Heads"
-        if self.item.unit == 'HD' and self.quantity == 1:
+        if self.item.unit == 'hd' and self.quantity == 1:
             return "Head"
-        if self.item.unit == 'C':
+        if self.item.unit == 'c':
             return "Count"
 
 

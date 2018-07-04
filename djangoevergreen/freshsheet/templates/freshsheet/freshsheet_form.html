@@ -63,19 +63,24 @@
                 {% for category_name, items in food_item_groups.items %}
                     <div class="three wide veggie column">
                         <label id="category">{{ category_name|capfirst }}</label>
-                        {% for item in items %}
-                            <div class="ui checkbox">
-                                <input name="items"
-                                       id="food_item_{{ item.pk }}"
-                                       type="checkbox"
-                                       tabindex="0"
-                                       class="hidden"
-                                       value="{{ item.pk }}"
-                                       {% if item in form.initial.items %}checked="checked"{% endif %}>
-                                <label for="food_item_{{ item.pk }}">{{ item }}</label>
-                            </div>
-                        {% endfor %}
+                        <fieldset id="{{ forloop.counter }}">
+                        <a rel="{{ forloop.counter }}" href="#select_all">Select All</a>
+                        <a rel="{{ forloop.counter }}" href="#select_none">Select None</a>
+                            {% for item in items %}
+                                <div class="ui checkbox">
+                                    <input name="items"
+                                           id="food_item_{{ item.pk }}"
+                                           type="checkbox"
+                                           tabindex="0"
+                                           class="hidden"
+                                           value="{{ item.pk }}"
+                                           {% if item in form.initial.items %}checked="checked"{% endif %}>
+                                    <label for="food_item_{{ item.pk }}">{{ item }}</label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
                     </div>
+
                 {% endfor %}
             </div>
             <div id="left_align">
@@ -87,6 +92,16 @@
     <script>
         $(document).ready(function () {
             $('.ui.checkbox').checkbox()
+
+            $("a[href='#select_all']").click(function () {
+                $("#" + $(this).attr('rel') + " INPUT[type='checkbox']").attr('checked', true);
+                return false;
+            });
+            // Select none
+            $("a[href='#select_none']").click(function () {
+                $("#" + $(this).attr('rel') + " INPUT[type='checkbox']").attr('checked', false);
+                return false;
+            });
         })
     </script>
 {% endblock %}
