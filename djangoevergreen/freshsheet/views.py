@@ -336,6 +336,7 @@ def upload_csv(request):
 
         lines = file_data.split("\n")
         # loop over the lines and save them in db. If error , store as string and then display
+
         for line in lines:
             fields = line.split(",")
             data_dict = {}
@@ -345,11 +346,12 @@ def upload_csv(request):
             data_dict["category"] = fields[3]
             data_dict["account"] = fields[4]
             data_dict["type"] = fields[5]
-            print(data_dict)
+
             try:
-                form = FoodItem(data_dict)
-                form.save()
-                print(form)
+                # Still need to check for wholesale pricing
+                food_item = FoodItem.objects.create(**data_dict)
+                food_item.save()
+
             except Exception as e:
                 logging.getLogger("error_logger").error(repr(e))
                 pass

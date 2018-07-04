@@ -74,9 +74,7 @@ ROOT_URLCONF = 'djangoevergreen.urls'
 # Data stored in secret_settings.py
 SECRET_KEY = os.getenv('SECRET_KEY', 'a-secret-key')
 
-
 # Pull os.getenv data from direnv.
-
 # Databases for Heroku Postgresql
 
 # Default database for local dev
@@ -122,8 +120,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'wsgi.application'
-
-
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -193,4 +189,3 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 # -----------------------------------------------------------------------------
 
 SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
-

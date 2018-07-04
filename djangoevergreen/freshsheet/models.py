@@ -177,6 +177,7 @@ class FoodItem(models.Model):
     # Example: 100
     quantity = models.PositiveIntegerField(
         default=0,
+        null=True,
     )
 
     # Example: 100.00
@@ -195,6 +196,7 @@ class FoodItem(models.Model):
 
     case_price = models.DecimalField(
         default=None,
+        null=True,
         max_digits=5,
         decimal_places=2,
         verbose_name="Case Price"
@@ -208,6 +210,7 @@ class FoodItem(models.Model):
 
     wholesale_price = models.DecimalField(
         default=None,
+        null=True,
         max_digits=5,
         decimal_places=2,
         verbose_name="Wholesale Price"
