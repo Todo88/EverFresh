@@ -213,6 +213,22 @@ class FoodItem(models.Model):
         verbose_name="Wholesale Price"
     )
 
+    account = models.CharField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name="Account",
+        max_length=20
+    )
+
+    type = models.CharField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name="Type",
+        max_length=20
+    )
+
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):

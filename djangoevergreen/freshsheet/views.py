@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import render, redirect
@@ -8,7 +9,7 @@ from django.template import loader
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
-
+import logging
 from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest
 
 
@@ -25,6 +26,7 @@ def home(request):
         "cart_quantities": cart_quantities,
     })
 
+
 # details must pass database info to call from database in details.html
 
 
@@ -36,7 +38,6 @@ def cart(request):
 
 
 def _add_to_cart(user, item_pk, quantity):
-
     # Example checks:
     #  - Is the FoodItem expired, maybe? do we have enough quantity to even sell it?
     #  - Is the quantity given > 0?
@@ -75,7 +76,6 @@ def add_to_cart_view(request, item_pk, quantity):
         return HttpResponse()
     else:
         raise Http404
-
 
 
 @login_required
@@ -132,14 +132,15 @@ def checkout(request):
     cart.save()
 
     # SEND EMAIL TO HUGH
-    #send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
+    # send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
 
     # SEND EMAIL TO CUSTOMER
     # ex: send_mail('Subject here', 'Here is the message.', 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
 
     html_message = loader.render_to_string('freshsheet/invoice.html', {'invoice': cart})
 
-    send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'myersb88@gmail.com', ['myersb88@gmail.com'],
+    send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'myersb88@gmail.com',
+              ['myersb88@gmail.com'],
               fail_silently=False, html_message=html_message)
 
     request.user.cart = None
@@ -192,6 +193,7 @@ def add_line_items_to_cart(request):
 
 # -----------------------------------------------------------------------------
 # Freshsheets
+# -----------------------------------------------------------------------------
 
 
 def list_freshsheets(request):
@@ -315,3 +317,45 @@ class FreshSheetDeleteView(FreshSheetFormViewMixin, DeleteView):
     template_name = 'freshsheet/freshsheet_confirm_delete.html'
 
 
+def upload_csv(request):
+    data = {}
+    if "GET" == request.method:
+        return render(request, "freshsheet/upload_csv.html", data)
+    # if not GET, then proceed
+    try:
+        csv_file = request.FILES["csv_file"]
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, 'File is not CSV type')
+            return HttpResponseRedirect(reverse("list_freshsheets"))
+        # if file is too large, return
+        if csv_file.multiple_chunks():
+            messages.error(request, "Uploaded file is too big (%.2f MB)." % (csv_file.size/(1000*1000),))
+            return HttpResponseRedirect(reverse("list_freshsheets"))
+
+        file_data = csv_file.read().decode("utf-8")
+
+        lines = file_data.split("\n")
+        # loop over the lines and save them in db. If error , store as string and then display
+        for line in lines:
+            fields = line.split(",")
+            data_dict = {}
+            data_dict["name"] = fields[0]
+            data_dict["unit"] = fields[1]
+            data_dict["price"] = fields[2]
+            data_dict["category"] = fields[3]
+            data_dict["account"] = fields[4]
+            data_dict["type"] = fields[5]
+            print(data_dict)
+            try:
+                form = FoodItem(data_dict)
+                form.save()
+                print(form)
+            except Exception as e:
+                logging.getLogger("error_logger").error(repr(e))
+                pass
+
+    except Exception as e:
+        logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
+        messages.error(request, "Unable to upload file. "+repr(e))
+
+    return HttpResponseRedirect(reverse("list_freshsheets"))

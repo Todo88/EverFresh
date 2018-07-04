@@ -38,6 +38,7 @@ urlpatterns = [
     path('freshsheets/edit/<int:pk>', views.FreshSheetUpdateView.as_view(), name="edit_freshsheet"),
     path('freshsheets/delete/<int:pk>', views.FreshSheetDeleteView.as_view(), name="delete_freshsheet"),
     path('freshsheets/publish/<int:pk>', views.publish, name="publish_freshsheet"),
+    path('freshsheets/upload_csv/', views.upload_csv, name='upload_csv'),
 ]
 
 if settings.DEBUG:

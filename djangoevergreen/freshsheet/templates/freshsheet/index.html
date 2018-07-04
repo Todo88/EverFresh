@@ -1,15 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <style>
+        .form-control {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        form {
+            display: inline-grid;
+        }
+    </style>
     <!-- Index -->
-
-    {##}
     <h1 class="massive">Fresh Sheet Index</h1>
-
     <a href="{% url "create_freshsheet" %}" class="ui button primary">
         <i class="icon plus"></i> Create Freshsheet
     </a>
 
+    <form action="{% url "upload_csv" %}" id="submissionform" method="POST" enctype="multipart/form-data"
+          class="ui form">
+        {% csrf_token %}
+        <input type="file" (change)="fileEvent($event)" name="csv_file" id="csv_file" required class="form-control">
+        <label for="csv_file" class="ui button">
+                <i class="ui upload icon"></i>Upload CSV
+            </label>
+    </form>
     <ul class="collection">
         {% for freshsheet in freshsheets %}
             <li class="collection-item">
@@ -22,11 +41,15 @@
     </ul>
 
     <script>
-        var confirm_publish = function(url) {
-            if(confirm("Are you sure you want to publish? This will send an email to each client!")) {
+        var confirm_publish = function (url) {
+            if (confirm("Are you sure you want to publish? This will send an email to each client!")) {
                 window.location = url
             }
         }
+
+        document.getElementById("csv_file").onchange = function () {
+            document.getElementById("submissionform").submit();
+        };
     </script>
 {% endblock %}
 
