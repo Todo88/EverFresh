@@ -1,3 +1,5 @@
+import csv
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -10,19 +12,34 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
 import logging
-from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest
+import re
+from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm
 
 
 def home(request):
+    freshsheet = FreshSheet.objects.filter(published=True).last()
     cart_quantities = {}
+    processed_items = {}
+    # food_item_group = []
+    # food_items = FoodItem.objects.all()
+    #
+    # for item in food_items:
+    #     if item.category not in food_item_group:
+    #         food_item_group.append(item.category)
 
     if hasattr(request.user, 'cart') and request.user.cart:
         for line_item in request.user.cart.items.all():
             # Need to make the key a str here so in the template we can access it from the str version of pk
             cart_quantities[str(line_item.item.pk)] = line_item.quantity
 
+    for item in freshsheet.items.all().order_by('category'):
+        if item.category not in processed_items:
+            processed_items[item.category] = []
+        processed_items[item.category].append(item)
+
     return render(request, 'freshsheet/home.html', {
-        "freshsheet": FreshSheet.objects.filter(published=True).last(),
+        # "freshsheet": FreshSheet.objects.filter(published=True).last(),
+        "processed_items": processed_items,
         "cart_quantities": cart_quantities,
     })
 
@@ -177,8 +194,6 @@ def add_line_items_to_cart(request):
             request.user.cart.items.add(new_line_item)
     """
 
-    print(request.POST)
-
     for name, value in request.POST.items():
         try:
             value = int(value)
@@ -324,6 +339,7 @@ def upload_csv(request):
     # if not GET, then proceed
     try:
         csv_file = request.FILES["csv_file"]
+
         if not csv_file.name.endswith('.csv'):
             messages.error(request, 'File is not CSV type')
             return HttpResponseRedirect(reverse("list_freshsheets"))
@@ -332,29 +348,47 @@ def upload_csv(request):
             messages.error(request, "Uploaded file is too big (%.2f MB)." % (csv_file.size/(1000*1000),))
             return HttpResponseRedirect(reverse("list_freshsheets"))
 
-        file_data = csv_file.read().decode("utf-8")
+        file_data = csv_file.read().decode("utf-8").splitlines()
 
-        lines = file_data.split("\n")
-        # loop over the lines and save them in db. If error , store as string and then display
+        print(file_data[0])
 
-        for line in lines:
-            fields = line.split(",")
-            data_dict = {}
-            data_dict["name"] = fields[0]
-            data_dict["unit"] = fields[1]
-            data_dict["price"] = fields[2]
-            data_dict["category"] = fields[3]
-            data_dict["account"] = fields[4]
-            data_dict["type"] = fields[5]
+        reader = csv.DictReader(file_data)
 
-            try:
-                # Still need to check for wholesale pricing
-                food_item = FoodItem.objects.create(**data_dict)
-                food_item.save()
+        for row in reader:
 
-            except Exception as e:
-                logging.getLogger("error_logger").error(repr(e))
-                pass
+            farm, _ = Farm.objects.get_or_create(name=row['Farm'])
+
+            defaults = {
+                "unit": row['Unit'],
+                "price": row['Price'],
+                "category": row['Category'],
+                "account": row['Account'],
+                "type": row['Type'],
+                "farm": farm,
+            }
+
+            if 'Case Price' in row and row['Case Price']:
+                defaults["case_price"] = row['Case Price']
+                print('Case Price ' + defaults['case_price'])
+
+            if 'Case Count' in row and row['Case Count']:
+                defaults["case_count"] = row['Case Count']
+                print('Case Count ' + defaults['case_count'])
+
+            if 'Wholesale Price' in row and row['Wholesale Price']:
+                defaults["wholesale_price"] = row['Wholesale Price']
+                print('Wholesale Price ' + defaults['wholesale_price'])
+
+            if 'Wholesale Count' in row and row['Wholesale Count']:
+                defaults["wholesale_count"] = row['Wholesale Count']
+                print('Wholesale Count ' + defaults['wholesale_count'])
+
+
+            FoodItem.objects.update_or_create(
+                name=row['Name'],
+                defaults=defaults,
+            )
+
 
     except Exception as e:
         logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))

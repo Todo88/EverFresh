@@ -21,41 +21,21 @@ class Farm(models.Model):
         max_length=255,
     )
 
-    # Example: ('R', 'red'),
-    RIBBON_COLOR = (('R', 'red'),
-                    ('OR', 'orange'),
-                    ('Y', 'yellow'),
-                    ('OL', 'olive'),
-                    ('G', 'green'),
-                    ('T', 'teal'),
-                    ('B', 'blue'),
-                    ('V', 'violet'),
-                    ('PU', 'purple'),
-                    ('PI', 'pink'),
-                    ('BR', 'brown'),
-                    ('G', 'grey'),
-                    ('BL', 'black'),
-                    )
-
-    ribbon_color = models.CharField(
-        max_length=20,
-        choices=RIBBON_COLOR,
-        null=True,
-        blank=True,
-        default='',
-    )
-
     # Example: (555)555-5555
     # Example: 5555555555
     # Example: 555-555-5555
     phone = models.CharField(
         default='',
         max_length=15,
+        blank=True,
+        null=True
     )
 
     # Example: example@example.com
     email = models.EmailField(
         default='',
+        blank=True,
+        null=True
     )
 
     # Example: ('WA', 'Washington')
@@ -114,13 +94,15 @@ class Farm(models.Model):
         max_length=40,
         choices=STATE,
         null=True,
-        blank=False,
+        blank=True,
         default='WA'
     )
 
     city = models.CharField(
         default='',
         max_length=100,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -326,18 +308,35 @@ class FreshSheet(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name="items")
-    item = models.ForeignKey(FoodItem, on_delete=models.SET_NULL, null=True, blank=True)
+    item = models.ForeignKey(FoodItem, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     @property
     def total_cost(self):
-        if self.quantity < self.item.case_count:
-            return self.price * self.quantity
-        if self.item.case_count <= self.quantity < self.item.wholesale_count:
-            return self.item.case_price * self.quantity
-        if self.item.wholesale_count <= self.quantity:
-            return self.item.wholesale_price * self.quantity
+        # NOT DRY AT ALL, NEEDS WORK ON LOGIC FOR CONDENSATION.
+        if self.item.case_count is None or self.item.wholesale_count is None:
+            if self.item.case_count is None and self.item.wholesale_count is None:
+                return self.item.price * self.quantity
+            if self.item.wholesale_count is not None:
+                if self.quantity >= self.item.wholesale_count and self.item.wholesale_count is not None:
+                    return self.item.wholesale_price * self.quantity
+            if self.item.case_count is not None:
+                if self.item.case_count <= self.quantity < self.item.wholesale_count and self.item.case_count is not None:
+                    return self.item.case_price * self.quantity
+                return self.item.price * self.quantity
+            else:
+                return self.item.price * self.quantity
+
+        if self.item.case_count is not None and self.item.wholesale_count is not None:
+            if self.quantity >= self.item.wholesale_count:
+                return self.quantity * self.item.wholesale_price
+            if self.item.case_count <= self.quantity < self.item.wholesale_count:
+                return self.quantity * self.item.case_price
+            if self.quantity < self.item.case_count:
+                return self.quantity * self.item.price
+
+
 
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:

@@ -53,7 +53,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for food_item in freshsheet.items.all|dictsort:"name" %}
+            {% for food_item in freshsheet.items.all|dictsort:"category" %}
                 <tr onclick="$(this).find('input').focus()" class="food_item_row">
                     <td id="product_name">{{ food_item.name }}</td>
                     <td id="product_name">{{ food_item.farm }}</td>

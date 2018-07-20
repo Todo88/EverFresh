@@ -41,10 +41,21 @@
             float: right;
             width: 10%;
         }
+
+        #login_btn {
+            width: 20%;
+            float: right;
+        }
+
+        #category_header {
+            background-color: rgba(249, 157, 28, 0.14);
+            font-size: 1.1rem;
+            color: #a83623;
+        }
     </style>
 
     <!--Page Title-->
-    <h1> {{ freshsheet.created_at }} Fresh Sheet </h1>
+    <h1> {{ freshsheet.created_at }} Fresh Sheet  </h1>
 
 
     <!--List View-->
@@ -63,30 +74,42 @@
             </tr>
             </thead>
             <tbody>
-            {% for food_item in freshsheet.items.all|dictsort:"name" %}
-                <tr onclick="$(this).find('input').focus()" class="food_item_row">
-                    <td id="product_name">
-                        {{ food_item.name }}
-                    </td>
-                    <td>
-                       {{ food_item.farm }}
-                    </td>
-                    <td class="right aligned">
-                        <div class="field">
-                            <div id="qty_id" class="ui fluid right labeled input">
-                                <input name="food_item_{{ food_item.pk }}" type="number" min="1"
-                                       max="9999" class="right aligned">
-                                <div id="qty_label" style="width: 5em;" class="ui right aligned basic label">
-                                    {{ food_item.get_unit_verbose }}
+            {% for category, items in processed_items.items %}
+                <td colspan="7" id="category_header">{{ category }}</td>
+                {% for food_item in items %}
+                    <tr onclick="$(this).find('input').focus()" class="food_item_row">
+                        <td id="product_name">
+                            {{ food_item.name }}
+                        </td>
+                        <td>
+                            {{ food_item.farm }}
+                        </td>
+                        <td class="right aligned">
+                            <div class="field">
+                                <div id="qty_id" class="ui fluid right labeled input">
+                                    <input name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                           max="9999" class="right aligned">
+                                    <div id="qty_label" style="width: 5em;" class="ui right aligned basic label">
+                                        {{ food_item.get_unit_verbose }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="right aligned">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
-                    <td class="right aligned">${{ food_item.price }}</td>
-                    <td class="right aligned">${{ food_item.case_price }} ({{ food_item.case_count }}+)</td>
-                    <td class="right aligned">${{ food_item.wholesale_price }} ({{ food_item.wholesale_count }}+)</td>
-                </tr>
+                        </td>
+                        <td class="right aligned">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
+                        <td class="right aligned">${{ food_item.price }}</td>
+                        {% if food_item.case_price == None  %}
+                            <td class="right aligned"></td>
+                        {% else %}
+                            <td class="right aligned">${{ food_item.case_price }} ({{ food_item.case_count }}+)</td>
+                        {% endif %}
+
+                        {% if food_item.wholesale_price == None %}
+                            <td class="right aligned"></td>
+                        {% else %}
+                        <td class="right aligned">${{ food_item.wholesale_price }} ({{ food_item.wholesale_count }}+)</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
             {% endfor %}
             </tbody>
             <tfoot class="full-width">
@@ -98,7 +121,7 @@
                         </button>
                     {% else %}
                         <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
-                            You must login
+                            You must login to add items to cart
                         </a>
                     {% endif %}
                 </th>
