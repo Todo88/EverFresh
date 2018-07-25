@@ -64,6 +64,7 @@
         .ui.secondary.menu .active.item {
             background: none !important;
             border-radius: 0;
+            outline: none;
         }
 
         .ui.secondary.menu .active.item::after {
@@ -73,6 +74,7 @@
             display: block;
             width: 100%;
             background: transparent;
+            outline: none;
         }
 
         .ui.secondary.menu a.item {
@@ -80,6 +82,7 @@
             border-bottom: 3px solid transparent;
             display: inline-block;
             background: transparent;
+            outline: none;
         }
 
         .ui.secondary.menu a.item::after {
@@ -91,10 +94,12 @@
             display: block;
             padding-bottom: 2px;
             background: transparent;
+            outline: none;
         }
 
         .ui.secondary.menu a.item:hover {
             background: none;
+            outline: none;
         }
 
         .ui.secondary.menu a.item:hover::after {
@@ -105,6 +110,23 @@
             display: block;
             width: 100%;
             background: transparent;
+            outline: none;
+        }
+
+        ui.secondary.menu a.item:focus {
+            background-color: transparent!important;
+            outline: none!important;
+        }
+
+        .ui.secondary.menu a.item:focus::after {
+            border-radius: 0;
+            font-weight: bold;
+            padding-bottom: 2px;
+            border-bottom: 3px solid rgb(95, 148, 68);
+            display: block;
+            width: 100%;
+            background: transparent!important;
+            outline: none!important;
         }
 
         .sm.item {

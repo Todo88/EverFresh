@@ -36,7 +36,7 @@
     <table>
         <tbody><div style="font-weight: bolder;">BILL TO</div>
     <tr>
-        <td>[Name]<br>[Company Name]<br>[Street Address]<br>[City, ST ZIP]<br>[Phone]<br>[Email Address]</td>
+        <td>{{ invoice.created_by }}<br>[Company Name]<br>[Street Address]<br>[City, ST ZIP]<br>[Phone]<br>{{ invoice.created_by.email }}</td>
         <td></td>
     </tr>
     </tbody>

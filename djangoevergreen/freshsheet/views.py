@@ -38,7 +38,7 @@ def home(request):
         processed_items[item.category].append(item)
 
     return render(request, 'freshsheet/home.html', {
-        # "freshsheet": FreshSheet.objects.filter(published=True).last(),
+        "freshsheet": FreshSheet.objects.filter(published=True).last(),
         "processed_items": processed_items,
         "cart_quantities": cart_quantities,
     })
@@ -173,7 +173,6 @@ def checkout(request):
 @login_required
 def invoice(request, order_pk):
     # Make sure the ONLY person who owns this invoice or ADMIN can view this
-    print(order_pk)
     try:
         invoice = Order.objects.get(pk=order_pk)
         return render(request, 'freshsheet/invoice.html', {"invoice": invoice})
