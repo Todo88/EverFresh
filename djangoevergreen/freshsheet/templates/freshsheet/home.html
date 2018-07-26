@@ -51,7 +51,7 @@
         }
 
         table {
-            border: none!important;
+            border: none !important;
         }
 
         .ui.celled.table tr td:first-child, .ui.celled.table tr th:first-child {
@@ -62,7 +62,7 @@
             border-right: solid gainsboro 1px
         }
 
-        .ui.celled.table tr #category_header:first-child{
+        .ui.celled.table tr #category_header:first-child {
             border-right: none;
         }
 
@@ -76,7 +76,9 @@
             border-left: none;
         }
 
-
+        .hidden {
+            display: none;
+        }
     </style>
 
     <!--Page Title-->
@@ -84,9 +86,10 @@
 
 
     <!--List View-->
+    <div><a href=".">Reset Sorting</a></div>
     <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
         {% csrf_token %}
-        <table class="ui unstackable compact celled definition table">
+        <table class="ui sortable unstackable compact celled definition table">
             <thead class="ui sticky full-width">
             <tr>
                 <th class="two wide left aligned">Product</th>
@@ -100,8 +103,15 @@
             </thead>
             <tbody>
             {% for category, items in processed_items.items %}
-                <tr style="border-left: none;">
-                    <td colspan="7" id="category_header">{{ category }}</td>
+                <tr class="cat_header" style="border-left: none;">
+                    <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+
                 </tr>
                 {% for food_item in items %}
                     <tr onclick="$(this).find('input').focus()" class="food_item_row">
@@ -123,19 +133,22 @@
                             </div>
                         </td>
                         <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
-                        <td class="right aligned one wide column">${{ food_item.price }}</td>
+                        <td data-value="{{ food_item.price }}" class="right aligned one wide column">
+                            ${{ food_item.price }}</td>
                         {% if food_item.case_price == None %}
-                            <td class="right aligned one wide column"></td>
+                            <td class="center aligned one wide column">--</td>
                         {% else %}
-                            <td class="right aligned one wide column">${{ food_item.case_price }}
+                            <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
+                                ${{ food_item.case_price }}
                                 ({{ food_item.case_count }}+)
                             </td>
                         {% endif %}
 
                         {% if food_item.wholesale_price == None %}
-                            <td class="right aligned one wide column"></td>
+                            <td class="center aligned one wide column">--</td>
                         {% else %}
-                            <td class="right aligned one wide column">${{ food_item.wholesale_price }}
+                            <td data-value="food_item.wholesale_price" class="right aligned one wide column">
+                                ${{ food_item.wholesale_price }}
                                 ({{ food_item.wholesale_count }}+)
                             </td>
                         {% endif %}
@@ -170,7 +183,13 @@
                 // your add_quantity function stuff here
                 var quantity = $(event.target).parent().find('input').val();
                 $.get("/add_to_cart/" + this.dataset.itemId + "/" + quantity + "/" + "?freshsheet_pk={{ freshsheet.pk }}")
-            })
+            });
+
+            $('table').tablesort();
+
+            $('table th').click(function () {
+                $('.category_header').addClass('hidden')
+            });
         });
     </script>
 {% endblock %}

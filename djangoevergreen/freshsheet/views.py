@@ -368,20 +368,15 @@ def upload_csv(request):
 
             if 'Case Price' in row and row['Case Price']:
                 defaults["case_price"] = row['Case Price']
-                print('Case Price ' + defaults['case_price'])
 
             if 'Case Count' in row and row['Case Count']:
                 defaults["case_count"] = row['Case Count']
-                print('Case Count ' + defaults['case_count'])
 
             if 'Wholesale Price' in row and row['Wholesale Price']:
                 defaults["wholesale_price"] = row['Wholesale Price']
-                print('Wholesale Price ' + defaults['wholesale_price'])
 
             if 'Wholesale Count' in row and row['Wholesale Count']:
                 defaults["wholesale_count"] = row['Wholesale Count']
-                print('Wholesale Count ' + defaults['wholesale_count'])
-
 
             FoodItem.objects.update_or_create(
                 name=row['Name'],
