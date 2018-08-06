@@ -34,11 +34,13 @@
 
         #add_items {
             float: right;
-            width: 10%;
+            width: 10em;
+            margin-top: 1em;
         }
 
         #login_btn {
-            width: 20%;
+            width: 5em;
+            margin-top: 1em;
             float: right;
         }
 
@@ -52,6 +54,8 @@
 
         table {
             border: none !important;
+            overflow-x: scroll;
+            margin: 0 auto;
         }
 
         .ui.celled.table tr td:first-child, .ui.celled.table tr th:first-child {
@@ -79,6 +83,13 @@
         .hidden {
             display: none;
         }
+
+        .inner {
+            overflow-x: auto;
+            white-space: nowrap;
+            margin: 0 auto;
+        }
+
     </style>
 
     <!--Page Title-->
@@ -87,96 +98,96 @@
     <div><a href=".">Reset Sorting</a></div>
     <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
         {% csrf_token %}
-        <table class="ui sortable unstackable compact celled definition table">
-            <thead class="ui sticky full-width">
-            <tr>
-                <th class="two wide left aligned">Product</th>
-                <th class="two wide left aligned">Farm</th>
-                <th class="two wide right aligned">Quantity</th>
-                <th class="one wide right aligned">Qty. in Cart</th>
-                <th class="one wide right aligned">Split Cost</th>
-                <th class="one wide right aligned">Case Cost</th>
-                <th class="one wide right aligned">W.S. Cost</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for category, items in processed_items.items %}
-                <tr class="cat_header" style="border-left: none;">
-                    <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
-                    <td class="hidden"></td>
-                    <td class="hidden"></td>
-                    <td class="hidden"></td>
-                    <td class="hidden"></td>
-                    <td class="hidden"></td>
-                    <td class="hidden"></td>
-
+        <div class="inner">
+            <table class="ui sortable unstackable compact celled definition table">
+                <thead class="ui full-width">
+                <tr>
+                    <th class="two wide left aligned">Product</th>
+                    <th class="two wide left aligned">Farm</th>
+                    <th class="two wide right aligned">Quantity</th>
+                    <th class="one wide right aligned">Qty. in Cart</th>
+                    <th class="one wide right aligned">Split Cost</th>
+                    <th class="one wide right aligned">Case Cost</th>
+                    <th class="one wide right aligned">W.S. Cost</th>
                 </tr>
-                {% for food_item in items %}
-                    <tr onclick="$(this).find('input').focus()" class="food_item_row">
-                        <td class="two wide column" id="product_name">
-                            {{ food_item.name }}
-                        </td>
-                        <td class="two wide column">
-                            {{ food_item.farm }}
-                        </td>
-                        <td class="right aligned two wide column">
-                            <div class="field">
-                                <div id="qty_id" class="ui fluid right labeled input">
-                                    <input name="food_item_{{ food_item.pk }}" type="number" min="1"
-                                           max="9999" class="right aligned">
-                                    <div id="qty_label" style="width: 5em;" class="ui right aligned basic label">
-                                        {{ food_item.get_unit_verbose }}
+                </thead>
+                <tbody>
+                {% for category, items in processed_items.items %}
+                    <tr class="cat_header" style="border-left: none;">
+                        <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+
+                    </tr>
+                    {% for food_item in items %}
+                        <tr onclick="$(this).find('input').focus()" class="food_item_row">
+                            <td class="two wide column" id="product_name">
+                                {{ food_item.name }}
+                            </td>
+                            <td class="two wide column">
+                                {{ food_item.farm }}
+                            </td>
+                            <td class="right aligned two wide column">
+                                <div class="field">
+                                    <div id="qty_id" class="ui right labeled input">
+                                        <input name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                               max="999" class="right aligned">
+                                        <div id="mobile_qty_label" style="width: 3em;"
+                                             class="ui right aligned basic label">
+                                            {{ food_item.unit }}s
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
-                        <td data-value="{{ food_item.price }}" class="right aligned one wide column">
-                            ${{ food_item.price }}</td>
-                        {% if food_item.case_price == None %}
-                            <td class="center aligned one wide column">--</td>
-                        {% else %}
-                            <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
-                                ${{ food_item.case_price }}
-                                ({{ food_item.case_count }}+)
                             </td>
-                        {% endif %}
+                            <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
+                            <td data-value="{{ food_item.price }}" class="right aligned one wide column">
+                                ${{ food_item.price }}</td>
+                            {% if food_item.case_price == None %}
+                                <td class="center aligned one wide column">--</td>
+                            {% else %}
+                                <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
+                                    ${{ food_item.case_price }}
+                                    ({{ food_item.case_count }}+)
+                                </td>
+                            {% endif %}
 
-                        {% if food_item.wholesale_price == None %}
-                            <td class="center aligned one wide column">--</td>
-                        {% else %}
-                            <td data-value="food_item.wholesale_price" class="right aligned one wide column">
-                                ${{ food_item.wholesale_price }}
-                                ({{ food_item.wholesale_count }}+)
-                            </td>
-                        {% endif %}
-                    </tr>
+                            {% if food_item.wholesale_price == None %}
+                                <td class="center aligned one wide column">--</td>
+                            {% else %}
+                                <td data-value="food_item.wholesale_price" class="right aligned one wide column">
+                                    ${{ food_item.wholesale_price }}
+                                    ({{ food_item.wholesale_count }}+)
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
-            </tbody>
-            <tfoot class="full-width">
-            <tr>
-                <th colspan="7">
-                    {% if request.user.is_authenticated %}
-                        <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
-                            Add to Cart
-                        </button>
-                    {% else %}
-                        <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
-                            You must login to add items to cart
-                        </a>
-                    {% endif %}
-                </th>
-            </tr>
-            </tfoot>
-        </table>
+                </tbody>
+                <tfoot class="full-width">
+                <tr>
+                    <th colspan="7">
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% if request.user.is_authenticated %}
+            <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
+                Add to Cart
+            </button>
+        {% else %}
+            <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
+                You must login to add items to cart
+            </a>
+        {% endif %}
     </form>
 
     <script>
         $(document).ready(function () {
-            $('.ui.sticky')
-                .sticky();
-
             $(".order-button").click(function (event) {
                 // your add_quantity function stuff here
                 var quantity = $(event.target).parent().find('input').val();

@@ -35,6 +35,10 @@
             margin: 0 auto;
         }
 
+        body.pushable>.pusher {
+            background-color: rgb(245, 244, 244)!important;
+        }
+
         /* Make Vegetable names more easily readable in table */
         h1 {
             padding-top: 0.5em;
@@ -56,10 +60,26 @@
         #header_logo img {
             width: 20em;
             margin-left: 2em;
+            display: block;
+        }
+
+        #mobile_header_logo img {
+            display: none;
+            width: 5em;
+        }
+
+        @media (max-width: 991px) and (min-width: 200px) {
+            #header_logo {
+                display: none;
+            }
+
+            #mobile_header_logo img {
+                display: block;
+            }
         }
 
         .ui.secondary.menu {
-            margin: 0 5%;
+            margin: 1em 1em;
         }
 
         .ui.secondary.menu .active.item {
@@ -115,8 +135,8 @@
         }
 
         ui.secondary.menu a.item:focus {
-            background-color: transparent!important;
-            outline: none!important;
+            background-color: transparent !important;
+            outline: none !important;
         }
 
         .ui.secondary.menu a.item:focus::after {
@@ -126,8 +146,20 @@
             border-bottom: 3px solid rgb(95, 148, 68);
             display: block;
             width: 100%;
-            background: transparent!important;
-            outline: none!important;
+            background: transparent !important;
+            outline: none !important;
+        }
+
+        #menu_items {
+            justify-content: flex-end;
+            display: flex;
+            width: 100%;
+        }
+
+        @media (max-width: 630px) {
+            #menu_items {
+                display: none;
+            }
         }
 
         .sm.item {
@@ -156,12 +188,10 @@
 
         .wrapper {
             min-height: 80%;
-            margin: 0 20px -260px 20px;
         }
 
         .footer, .push {
-            height: 260px;
-            margin: 0 15%;
+            margin: 5em 0 0 0;
         }
 
         footer a:focus {
@@ -169,10 +199,25 @@
             color: white !important;
         }
 
-        #menu_items {
-            justify-content: flex-end;
-            display: flex;
-            width: 100%;
+        @media only screen and (max-width: 991px) and (min-width: 768px) {
+            .ui.container {
+                width: auto;
+                margin-left: 1em!important;
+                margin-right: 1em!important;
+            }
+        }
+
+        @media only screen and (max-width: 767px) {
+            .ui.container {
+                width: auto;
+
+            }
+        }
+
+        @media only screen and (min-width: 631px) {
+            #hamburger_btn {
+                display: none;
+            }
         }
 
         {% block css %}
@@ -181,47 +226,81 @@
 
 </head>
 <body>
-<div class="wrapper">
-    <div class="ui secondary menu">
-        <a id="header_logo" href="/"><img src="{% static "/images/Logo/eufoodhub.png" %}"/>
+<div class="ui inverted labeled icon right inline vertical sidebar menu" id="hamburger_icons">
+    <a href="{% url "home" %}" class="item ease">
+        Current Freshsheet
+    </a>
+    {% if request.user.is_staff or request.user.is_superuser %}
+        <a id="index_link" href="{% url "list_freshsheets" %}"
+           class="item ease {% if request.path == '/index/' %}active{% endif %}">
+            Freshsheets
         </a>
-
-        <div id="menu_items">
-            <a href="{% url "home" %}" class="item ease">
-                Current Freshsheet
+        <a href="/admin" class="item ease">
+            Admin
+        </a>
+    {% endif %}
+    {% if request.user.is_authenticated %}
+        <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
+            Cart
+            {% if request.user.cart %}
+                (${{ request.user.cart.order_total_cost }})
+            {% endif %}
+        </a>
+        <a href="{% url "logout" %}" class="item ease">Logout?</a>
+    {% endif %}
+    {% if not request.user.is_authenticated %}
+        <a href="{% url "auth_login" %}" class="item ease">User Login</a>
+    {% endif %}
+</div>
+<div class="pusher">
+    <div class="wrapper">
+        <div class="ui secondary menu">
+            <a id="header_logo" href="/"><img src="{% static "/images/Logo/eufoodhub.png" %}"/>
             </a>
-            {% if request.user.is_staff or request.user.is_superuser %}
-                <a id="index_link" href="{% url "list_freshsheets" %}"
-                   class="item ease {% if request.path == '/index/' %}active{% endif %}">
-                    Freshsheets
+            <a id="mobile_header_logo" href="/"><img src="{% static "/images/Logo/eu.png" %}"/>
+            </a>
+            <div style="margin-left: auto;" id="hamburger_btn" class="ui right">
+                <a class="item">
+                    <i class="sidebar icon"></i>
+                    Menu
                 </a>
-                <a href="/admin" class="item ease">
-                    Admin
+            </div>
+            <div id="menu_items">
+                <a href="{% url "home" %}" class="item ease">
+                    Current Freshsheet
                 </a>
-            {% endif %}
-            {% if request.user.is_authenticated %}
-                <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
-                    Cart
-                    {% if request.user.cart %}
-                        (${{ request.user.cart.order_total_cost }})
-                    {% endif %}
-                </a>
-                <a href="{% url "logout" %}" class="item ease">Logout?</a>
-            {% endif %}
-            {% if not request.user.is_authenticated %}
-                <a href="{% url "auth_login" %}" class="item ease">User Login</a>
-            {% endif %}
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <a id="index_link" href="{% url "list_freshsheets" %}"
+                       class="item ease {% if request.path == '/index/' %}active{% endif %}">
+                        Freshsheets
+                    </a>
+                    <a href="/admin" class="item ease">
+                        Admin
+                    </a>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                    <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
+                        Cart
+                        {% if request.user.cart %}
+                            (${{ request.user.cart.order_total_cost }})
+                        {% endif %}
+                    </a>
+                    <a href="{% url "logout" %}" class="item ease">Logout?</a>
+                {% endif %}
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url "auth_login" %}" class="item ease">User Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="ui container">
+
+            {% block content %}
+            {% endblock %}
+
         </div>
     </div>
-
-    <div class="ui container">
-
-        {% block content %}
-        {% endblock %}
-
-    </div>
 </div>
-
 <div class="push"></div>
 <footer>
     <div class="ui inverted vertical footer segment">
@@ -256,9 +335,19 @@
             <a href="/"><img src="../../static/images/Logo/EvergreenLogo.png" class="ui centered tiny image"></a>
         </div>
     </div>
+
 </footer>
 
 <script>
+
+    $(document).ready(function () {
+        $('#hamburger_btn').on('click', function () {
+            $('#hamburger_icons.sidebar')
+                .sidebar('setting', 'transition', 'overlay')
+                .sidebar('toggle')
+        })
+    });
+
 </script>
 </body>
 </html>
