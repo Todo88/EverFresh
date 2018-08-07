@@ -143,13 +143,6 @@ class FoodItem(models.Model):
         null=True,
     )
 
-    # Example: ('LB', 'Pounds'),
-    # UNIT = (('lb', 'Pound(s)'),
-    #         ('bu', 'Bundle'),
-    #         ('hd', 'Head'),
-    #         ('c', 'Count'),
-    #         )
-
     unit = models.CharField(
         max_length=15,
         default='lb',

@@ -14,6 +14,18 @@
         form {
             display: inline-grid;
         }
+
+        .wrapper {
+            min-height: 80vh;
+        }
+
+        .delete_freshsheet {
+            color: #bc001b;
+        }
+
+        .delete_freshsheet:hover {
+            color: #8e0012;
+        }
     </style>
     <!-- Index -->
     <h1 class="massive">Fresh Sheet Index</h1>
@@ -26,19 +38,38 @@
         {% csrf_token %}
         <input type="file" (change)="fileEvent($event)" name="csv_file" id="csv_file" required class="form-control">
         <label for="csv_file" class="ui button">
-                <i class="ui upload icon"></i>Upload CSV
-            </label>
+            <i class="ui upload icon"></i>Upload Pricing Data CSV
+        </label>
     </form>
-    <ul class="collection">
-        {% for freshsheet in freshsheets %}
-            <li class="collection-item">
-                <a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh Sheet</a> |
-                <a href="{% url "edit_freshsheet" pk=freshsheet.id %}">Edit</a> |
-                <a href="#" onclick="confirm_publish('{% url "publish_freshsheet" pk=freshsheet.id %}')">Publish</a> |
-                <a href="{% url "delete_freshsheet" pk=freshsheet.id %}">Delete</a>
-            </li>
+    <table class="ui unstackable table">
+        <thead>
+        <tr>
+            <th>Freshsheet Details</th>
+            <th>Edit</th>
+            <th>Publish</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for freshsheet in freshsheets reversed %}
+
+            <tr>
+                <td>
+                    <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh Sheet</a></strong>
+                </td>
+                <td>
+                        <a href="{% url "edit_freshsheet" pk=freshsheet.id %}"><i class="edit icon"></i>Edit</a>
+                </td>
+                <td>
+                    <a href="#" onclick="confirm_publish('{% url "publish_freshsheet" pk=freshsheet.id %}')"><i class="envelope icon"></i>Publish</a>
+                </td>
+                <td>
+                    <a class="delete_freshsheet" href="{% url "delete_freshsheet" pk=freshsheet.id %}"><i class="trash icon"></i>Delete</a>
+                </td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 
     <script>
         var confirm_publish = function (url) {

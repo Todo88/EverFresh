@@ -11,6 +11,7 @@
 
         table, thead th {
             color: #c2c2c2 !important;
+            white-space: nowrap;
         }
 
         #product_name {
@@ -32,8 +33,19 @@
         }
 
         form {
-            width: 60%;
+            width: 90%;
+            margin: 0 auto 3em;
+        }
+
+        .ui.section.divider {
+            width: 90%;
             margin: 0 auto;
+        }
+
+        .email_greeting {
+            font-family: inherit;
+            white-space: pre-wrap;
+            text-align: justify;
         }
     </style>
     <!--Page Title-->
@@ -42,14 +54,20 @@
     <!--List View-->
     <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
         {% csrf_token %}
-        <table class="ui compact celled definition table">
+        <h4 class="ui header">Message to Chefs</h4>
+        <div class="ui basic segment">
+            <pre class="email_greeting">{{ freshsheet.greeting }}</pre>
+        </div>
+        <div class="ui section divider"></div>
+
+        <table class="ui unstackable compact celled definition table">
             <thead class="full-width">
             <tr>
-                <th class="six wide left aligned">Product</th>
-                <th class="two wide left aligned">Farm</th>
+                <th class="three wide left aligned">Product</th>
+                <th class="three wide left aligned">Farm</th>
                 <th class="two wide center aligned">Price</th>
                 <th class="two wide center aligned">Case Price</th>
-                <th class="three wide center aligned">Wholesale Price</th>
+                <th class="two wide center aligned">Wholesale</th>
             </tr>
             </thead>
             <tbody>
@@ -57,9 +75,17 @@
                 <tr onclick="$(this).find('input').focus()" class="food_item_row">
                     <td id="product_name">{{ food_item.name }}</td>
                     <td id="product_name">{{ food_item.farm }}</td>
-                    <td class="right aligned">${{ food_item.price }}</td>
-                    <td class="right aligned">${{ food_item.case_price }}</td>
-                    <td class="right aligned">${{ food_item.wholesale_price }}</td>
+                    <td class="center aligned">${{ food_item.price }}</td>
+                    {% if food_item.case_price == None %}
+                        <td class="center aligned one wide column">--</td>
+                    {% else %}
+                        <td class="center aligned">${{ food_item.case_price }}</td>
+                    {% endif %}
+                    {% if food_item.wholesale_price == None %}
+                        <td class="center aligned one wide column">--</td>
+                    {% else %}
+                        <td class="center aligned">${{ food_item.wholesale_price }}</td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
@@ -69,7 +95,6 @@
             </tfoot>
         </table>
     </form>
-
 
     <script>
 
