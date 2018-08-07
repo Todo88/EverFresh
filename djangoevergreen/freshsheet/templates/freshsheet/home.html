@@ -39,13 +39,19 @@
         }
 
         #login_btn {
-            width: 5em;
+            width: 18.5em;
             margin-top: 1em;
             float: right;
         }
 
-        .ui.sticky + tr {
-            margin-top: 39px;
+        @media screen and (max-width:850px){
+            #login_btn {
+                width: 100%;
+            }
+
+            #add_items {
+                width: 100%;
+            }
         }
 
         td, th {
