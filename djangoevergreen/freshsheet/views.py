@@ -359,29 +359,57 @@ def upload_csv(request):
 
             defaults = {
                 "unit": row['Unit'],
-                "price": row['Price'],
+                "price": row['Each'],
                 "category": row['Category'],
                 "account": row['Account'],
                 "type": row['Type'],
                 "farm": farm,
             }
 
-            if 'Case Price' in row and row['Case Price']:
-                defaults["case_price"] = row['Case Price']
+            if 'Split' in row and row['Split']:
+                defaults["case_price"] = row['Split']
 
-            if 'Case Count' in row and row['Case Count']:
-                defaults["case_count"] = row['Case Count']
+            if 'SP/TH' in row and row['SP/TH']:
+                defaults["case_count"] = row['SP/TH']
 
-            if 'Wholesale Price' in row and row['Wholesale Price']:
-                defaults["wholesale_price"] = row['Wholesale Price']
+            if 'Case' in row and row['Case']:
+                defaults["wholesale_price"] = row['Case']
 
-            if 'Wholesale Count' in row and row['Wholesale Count']:
-                defaults["wholesale_count"] = row['Wholesale Count']
+            if 'CA/TH' in row and row['CA/TH']:
+                defaults["wholesale_count"] = row['CA/TH']
 
             FoodItem.objects.update_or_create(
-                name=row['Name'],
+                name=row['Item Name'],
                 defaults=defaults,
             )
+
+            # farm, _ = Farm.objects.get_or_create(name=row['Farm'])
+            #
+            # defaults = {
+            #     "category": row['Category'],
+            #     "farm": farm,
+            #     "unit": row['Unit'],
+            #     "price": row['Each'],
+            #     "account": row['Account'],
+            #     "type": row['Type'],
+            # }
+            #
+            # if 'Split' in row and row['Split']:
+            #     defaults["case_price"] = row['Split']
+            #
+            # if 'SP/TH' in row and row['SP/TH']:
+            #     defaults["case_count"] = row['SP/TH']
+            #
+            # if 'Case' in row and row['Case']:
+            #     defaults["wholesale_price"] = row['Case']
+            #
+            # if 'CA/TH' in row and row['CA/TH']:
+            #     defaults["wholesale_count"] = row['CA/TH']
+            #
+            # FoodItem.objects.update_or_create(
+            #     name=row['Item'],
+            #     defaults=defaults,
+            # )
 
 
     except Exception as e:

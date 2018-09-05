@@ -329,8 +329,6 @@ class OrderItem(models.Model):
             if self.quantity < self.item.case_count:
                 return self.quantity * self.item.price
 
-
-
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
             return "Pounds"
