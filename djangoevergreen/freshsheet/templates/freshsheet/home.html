@@ -44,7 +44,7 @@
             float: right;
         }
 
-        @media screen and (max-width:850px){
+        @media screen and (max-width: 850px) {
             #login_btn {
                 width: 100%;
             }
@@ -98,28 +98,136 @@
             margin: 0 auto;
         }
 
+        .row-product {
+            width: auto;
+        }
+
+        .row-farm {
+            width: auto;
+            padding: 5px;
+        }
+
+        .row-quantity {
+            width: auto;
+        }
+
+        #mobile_qty_label {
+            font-weight: 100;
+        }
+
+        .row-qty-cart {
+            width: auto;
+        }
+
+        .row-split {
+            width: auto;
+        }
+
+        .row-case {
+            width: auto;
+        }
+
+        .row-WS {
+            width: auto;
+        }
+
+        .cat_header {
+            border-left: none;
+        }
+
     </style>
 
     <!--Page Title-->
     <h1> {{ freshsheet.published_at }} Fresh Sheet </h1>
-    <!--List View-->
+
+    <!-- Fresh Sheet Table -->
     <div><a href=".">Reset Sorting</a></div>
+
     <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
         {% csrf_token %}
         <div class="inner">
             <table class="ui sortable unstackable compact celled definition table">
                 <thead class="ui full-width">
                 <tr>
-                    <th class="two wide left aligned">Product</th>
-                    <th class="two wide left aligned">Farm</th>
-                    <th class="two wide right aligned">Quantity</th>
-                    <th class="one wide right aligned">Qty. in Cart</th>
-                    <th class="one wide right aligned">Split Cost</th>
-                    <th class="one wide right aligned">Case Cost</th>
-                    <th class="one wide right aligned">W.S. Cost</th>
+                    <th class="row-product left aligned">Product</th>
+                    <th class="row-farm left aligned">Farm</th>
+                    <th class="row-quantity right aligned">Quantity</th>
+                    <th class="row-qty-cart right aligned">Qty. in Cart</th>
+                    <th class="row-split right aligned">Split Cost</th>
+                    <th class="row-case right aligned">Case Cost</th>
+                    <th class="row-WS right aligned">W.S. Cost</th>
                 </tr>
                 </thead>
                 <tbody>
+
+                <!-- Featured Section of the Table -->
+                <tr class="cat_header">
+                    <td colspan="7" id="category_header" class="category_header">Featured</td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                    <td class="hidden"></td>
+                </tr>
+                {% for category, items in processed_items.items %}
+                    {% for food_item in items %}
+                        {% if food_item.featured %}
+                            <tr onclick="$(this).find('input').focus()" class="food_item_row">
+                                <td class="two wide column" id="product_name">
+                                    {{ food_item.name }}
+                                </td>
+                                <td class="two wide column">
+                                    {{ food_item.farm }}
+                                </td>
+                                <td class="right aligned two wide column">
+                                    <div class="field">
+                                        <div id="qty_id" class="ui right labeled input">
+                                            <input name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                                   max="999" class="right aligned">
+                                            <div id="mobile_qty_label"
+                                                 class="ui right aligned basic label">
+                                                {{ food_item.unit }}s
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
+                                {% if request.user.is_authenticated %}
+                                    <td data-value="{{ food_item.price }}" class="right aligned one wide column">
+                                        ${{ food_item.price }}</td>
+                                    {% if food_item.case_price == None %}
+                                        <td class="center aligned one wide column">--</td>
+                                    {% else %}
+                                        <td data-value="{{ food_item.case_price }}"
+                                            class="right aligned one wide column">
+                                            ${{ food_item.case_price }}
+                                            ({{ food_item.case_count }}+)
+                                        </td>
+                                    {% endif %}
+
+                                    {% if food_item.wholesale_price == None %}
+                                        <td class="center aligned one wide column">--</td>
+                                    {% else %}
+                                        <td data-value="food_item.wholesale_price"
+                                            class="right aligned one wide column">
+                                            ${{ food_item.wholesale_price }}
+                                            ({{ food_item.wholesale_count }}+)
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if not request.user.is_authenticated %}
+                                    <td class="center aligned one wide column">--</td>
+                                    <td class="center aligned one wide column">--</td>
+                                    <td style="" class="center aligned three wide column">Login For Pricing</td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <!-- End Featured Section of the Table -->
+
+                <!-- Start sorting by Category -->
                 {% for category, items in processed_items.items %}
                     <tr class="cat_header" style="border-left: none;">
                         <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
@@ -129,7 +237,6 @@
                         <td class="hidden"></td>
                         <td class="hidden"></td>
                         <td class="hidden"></td>
-
                     </tr>
                     {% for food_item in items %}
                         <tr onclick="$(this).find('input').focus()" class="food_item_row">
@@ -144,7 +251,7 @@
                                     <div id="qty_id" class="ui right labeled input">
                                         <input name="food_item_{{ food_item.pk }}" type="number" min="1"
                                                max="999" class="right aligned">
-                                        <div id="mobile_qty_label" style="width: 3em;"
+                                        <div id="mobile_qty_label"
                                              class="ui right aligned basic label">
                                             {{ food_item.unit }}s
                                         </div>
@@ -152,24 +259,31 @@
                                 </div>
                             </td>
                             <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
-                            <td data-value="{{ food_item.price }}" class="right aligned one wide column">
-                                ${{ food_item.price }}</td>
-                            {% if food_item.case_price == None %}
-                                <td class="center aligned one wide column">--</td>
-                            {% else %}
-                                <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
-                                    ${{ food_item.case_price }}
-                                    ({{ food_item.case_count }}+)
-                                </td>
-                            {% endif %}
+                            {% if request.user.is_authenticated %}
+                                <td data-value="{{ food_item.price }}" class="right aligned one wide column">
+                                    ${{ food_item.price }}</td>
+                                {% if food_item.case_price == None %}
+                                    <td class="center aligned one wide column">--</td>
+                                {% else %}
+                                    <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
+                                        ${{ food_item.case_price }}
+                                        ({{ food_item.case_count }}+)
+                                    </td>
+                                {% endif %}
 
-                            {% if food_item.wholesale_price == None %}
+                                {% if food_item.wholesale_price == None %}
+                                    <td class="center aligned one wide column">--</td>
+                                {% else %}
+                                    <td data-value="food_item.wholesale_price" class="right aligned one wide column">
+                                        ${{ food_item.wholesale_price }}
+                                        ({{ food_item.wholesale_count }}+)
+                                    </td>
+                                {% endif %}
+                            {% endif %}
+                            {% if not request.user.is_authenticated %}
                                 <td class="center aligned one wide column">--</td>
-                            {% else %}
-                                <td data-value="food_item.wholesale_price" class="right aligned one wide column">
-                                    ${{ food_item.wholesale_price }}
-                                    ({{ food_item.wholesale_count }}+)
-                                </td>
+                                <td class="center aligned one wide column">--</td>
+                                <td class="center aligned three wide column">Login For Pricing</td>
                             {% endif %}
                         </tr>
                     {% endfor %}
@@ -190,7 +304,7 @@
 
     <script>
         $(document).ready(function () {
-            $(".order-button").click(function (event) {
+            $("#add_items").click(function (event) {
                 // your add_quantity function stuff here
                 var quantity = $(event.target).parent().find('input').val();
                 $.get("/add_to_cart/" + this.dataset.itemId + "/" + quantity + "/" + "?freshsheet_pk={{ freshsheet.pk }}")

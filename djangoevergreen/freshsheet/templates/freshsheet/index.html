@@ -26,6 +26,29 @@
         .delete_freshsheet:hover {
             color: #8e0012;
         }
+
+        .messages {
+            font-size: 20px;
+            width: auto;
+            padding-left: 0;
+        }
+
+        .messages > .error {
+            background-color: #ffd3d3;
+            outline: 1px solid #926060;
+            color: #926060;
+            padding: 15px;
+            list-style: none;
+        }
+
+        .messages > .success {
+            background-color: #d3ffd6;
+            outline: 1px solid #609262;
+            color: #609260;
+            padding: 15px;
+            list-style: none;
+        }
+
     </style>
     <!-- Index -->
     <h1 class="massive">Fresh Sheet Index</h1>
@@ -41,6 +64,13 @@
             <i class="ui upload icon"></i>Upload Pricing Data CSV
         </label>
     </form>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <table class="ui unstackable table">
         <thead>
         <tr>
@@ -55,16 +85,19 @@
 
             <tr>
                 <td>
-                    <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh Sheet</a></strong>
+                    <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh
+                        Sheet</a></strong>
                 </td>
                 <td>
-                        <a href="{% url "edit_freshsheet" pk=freshsheet.id %}"><i class="edit icon"></i>Edit</a>
+                    <a href="{% url "edit_freshsheet" pk=freshsheet.id %}"><i class="edit icon"></i>Edit</a>
                 </td>
                 <td>
-                    <a href="#" onclick="confirm_publish('{% url "publish_freshsheet" pk=freshsheet.id %}')"><i class="envelope icon"></i>Publish</a>
+                    <a href="#" onclick="confirm_publish('{% url "publish_freshsheet" pk=freshsheet.id %}')"><i
+                            class="envelope icon"></i>Publish</a>
                 </td>
                 <td>
-                    <a class="delete_freshsheet" href="{% url "delete_freshsheet" pk=freshsheet.id %}"><i class="trash icon"></i>Delete</a>
+                    <a class="delete_freshsheet" href="{% url "delete_freshsheet" pk=freshsheet.id %}"><i
+                            class="trash icon"></i>Delete</a>
                 </td>
             </tr>
         {% endfor %}
@@ -79,7 +112,9 @@
         };
 
         document.getElementById("csv_file").onchange = function () {
-            document.getElementById("submissionform").submit();
+            document.getElementById("submissionform").submit()
         };
+
+
     </script>
 {% endblock %}

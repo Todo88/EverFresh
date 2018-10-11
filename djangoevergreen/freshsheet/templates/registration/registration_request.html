@@ -53,6 +53,10 @@
             width: 18%;
             min-width: 150px;
         }
+
+        #id_message_box {
+            height: 5em;
+        }
     </style>
 
     <h1>Request an Account</h1>
@@ -81,6 +85,10 @@
         <p>
             <label for="id_email_address">Email:</label>
             <input type="email" name="email_address" maxlength="50" required id="id_email_address"/>
+        </p>
+        <p>
+            <label for="id_message_box">Leave us a message, comment, or request:</label>
+            <input type="text" name="message_box" maxlength="5000" id="id_message_box"/>
         </p>
         <button class="ui button" type="submit" value="{% trans 'Submit' %}">Request Account</button>
     </form>

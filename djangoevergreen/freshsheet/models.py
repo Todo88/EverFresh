@@ -14,7 +14,6 @@ from django.utils import timezone
 
 
 class Farm(models.Model):
-
     # Example: Bloom Creek Cranberries, Little Rock, WA
     name = models.CharField(
         default='',
@@ -108,6 +107,7 @@ class Farm(models.Model):
     def __str__(self):
         return self.name
 
+
 # ------------------------------------------------------------------------------
 # FoodItem Database Input
 # ------------------------------------------------------------------------------
@@ -118,6 +118,12 @@ class FoodItem(models.Model):
     name = models.CharField(
         default='',
         max_length=100,
+    )
+
+    featured = models.BooleanField(
+        default=False,
+        null=False,
+        blank=False,
     )
 
     farm = models.ForeignKey(
@@ -214,17 +220,20 @@ class FoodItem(models.Model):
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):
-        if self.unit == 'lb':
+        if self.unit == 'LB':
             return "Pounds"
-        if self.unit == 'bu':
+        if self.unit == 'BU':
             return "Bundles"
-        if self.unit == 'hd':
+        if self.unit == 'HD':
             return "Heads"
-        if self.unit == 'c':
+        if self.unit == 'C':
             return "Count"
+        else:
+            return self.unit
 
     def __str__(self):
         return self.name
+
 
 # ------------------------------------------------------------------------------
 # Restaurant Database Input
@@ -264,7 +273,6 @@ class Restaurant(models.Model):
 
 
 class FreshSheet(models.Model):
-
     greeting = models.TextField()
     items = models.ManyToManyField(FoodItem)
 
@@ -293,6 +301,7 @@ class FreshSheet(models.Model):
                 )
 
         return super().save(**kwargs)
+
 
 # ------------------------------------------------------------------------------
 # Order Model
@@ -386,6 +395,13 @@ class AccountRequest(models.Model):
     customer_position = models.CharField(verbose_name='Job Title', max_length=20)
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
     email_address = models.EmailField(verbose_name='Email', max_length=50)
+    message_box = models.TextField(
+        verbose_name='Please leave a message with your needs, questions, etc.',
+        max_length=5000,
+        default='',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.business_name

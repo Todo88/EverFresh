@@ -43,7 +43,6 @@ def home(request):
         "cart_quantities": cart_quantities,
     })
 
-
 # details must pass database info to call from database in details.html
 
 
@@ -348,11 +347,7 @@ def upload_csv(request):
             return HttpResponseRedirect(reverse("list_freshsheets"))
 
         file_data = csv_file.read().decode("utf-8").splitlines()
-
-        print(file_data[0])
-
         reader = csv.DictReader(file_data)
-
         for row in reader:
 
             farm, _ = Farm.objects.get_or_create(name=row['Farm'])
@@ -382,35 +377,6 @@ def upload_csv(request):
                 name=row['Item Name'],
                 defaults=defaults,
             )
-
-            # farm, _ = Farm.objects.get_or_create(name=row['Farm'])
-            #
-            # defaults = {
-            #     "category": row['Category'],
-            #     "farm": farm,
-            #     "unit": row['Unit'],
-            #     "price": row['Each'],
-            #     "account": row['Account'],
-            #     "type": row['Type'],
-            # }
-            #
-            # if 'Split' in row and row['Split']:
-            #     defaults["case_price"] = row['Split']
-            #
-            # if 'SP/TH' in row and row['SP/TH']:
-            #     defaults["case_count"] = row['SP/TH']
-            #
-            # if 'Case' in row and row['Case']:
-            #     defaults["wholesale_price"] = row['Case']
-            #
-            # if 'CA/TH' in row and row['CA/TH']:
-            #     defaults["wholesale_count"] = row['CA/TH']
-            #
-            # FoodItem.objects.update_or_create(
-            #     name=row['Item'],
-            #     defaults=defaults,
-            # )
-
 
     except Exception as e:
         logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
