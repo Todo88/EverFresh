@@ -1,4 +1,5 @@
 import csv
+from collections import OrderedDict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,7 @@ from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm
 def home(request):
     freshsheet = FreshSheet.objects.filter(published=True).last()
     cart_quantities = {}
-    processed_items = {}
+    processed_items = OrderedDict()
     # food_item_group = []
     # food_items = FoodItem.objects.all()
     #
@@ -32,10 +33,16 @@ def home(request):
             # Need to make the key a str here so in the template we can access it from the str version of pk
             cart_quantities[str(line_item.item.pk)] = line_item.quantity
 
+    processed_items['Featured'] = []
+
     for item in freshsheet.items.all().order_by('category'):
-        if item.category not in processed_items:
-            processed_items[item.category] = []
-        processed_items[item.category].append(item)
+        if item.featured:
+            category = 'Featured'
+        else:
+            category = item.category
+        if category not in processed_items:
+            processed_items[category] = []
+        processed_items[category].append(item)
 
     return render(request, 'freshsheet/home.html', {
         "freshsheet": FreshSheet.objects.filter(published=True).last(),
