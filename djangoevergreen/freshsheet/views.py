@@ -21,12 +21,6 @@ def home(request):
     freshsheet = FreshSheet.objects.filter(published=True).last()
     cart_quantities = {}
     processed_items = OrderedDict()
-    # food_item_group = []
-    # food_items = FoodItem.objects.all()
-    #
-    # for item in food_items:
-    #     if item.category not in food_item_group:
-    #         food_item_group.append(item.category)
 
     if hasattr(request.user, 'cart') and request.user.cart:
         for line_item in request.user.cart.items.all():
