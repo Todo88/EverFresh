@@ -30,3 +30,4 @@ traitlets==4.3.2
 typing==3.6.4
 wcwidth==0.1.7
 whitenoise==3.3.1
+python-quickbooks==0.7.5

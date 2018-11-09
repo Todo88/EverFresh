@@ -189,3 +189,8 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 # -----------------------------------------------------------------------------
 
 SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
+
+
+QUICKBOOKS_CLIENT_ID = os.environ.get('QUICKBOOKS_CLIENT_ID')
+QUICKBOOKS_SECRET = os.environ.get('QUICKBOOKS_SECRET')
+QUICKBOOKS_COMPANY_ID = os.environ.get('QUICKBOOKS_COMPANY_ID')

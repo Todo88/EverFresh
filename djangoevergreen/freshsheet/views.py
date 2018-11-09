@@ -148,6 +148,8 @@ def checkout(request):
     cart.status = "Pending"
     cart.save()
 
+    cart.send_to_quickbooks()
+
     # SEND EMAIL TO HUGH
     # send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
 

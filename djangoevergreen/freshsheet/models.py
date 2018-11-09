@@ -338,6 +338,16 @@ class OrderItem(models.Model):
             if self.quantity < self.item.case_count:
                 return self.quantity * self.item.price
 
+    @property
+    def unit_cost(self):
+        """Based on quantity/wholesale prices"""
+        if self.quantity >= self.item.wholesale_count:
+            return self.item.wholesale_price
+        if self.item.case_count <= self.quantity < self.item.wholesale_count:
+            return self.item.case_price
+        if self.quantity < self.item.case_count:
+            return self.item.price
+
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
             return "Pounds"
@@ -376,6 +386,52 @@ class Order(models.Model):
         for item in self.items.all():
             total_cost += item.total_cost
         return total_cost
+
+    def send_to_quickbooks(self):
+        from quickbooks import QuickBooks, Oauth2SessionManager
+        from quickbooks.objects import (Invoice,
+                                        SalesItemLineDetail,
+                                        SalesItemLine,
+                                        Ref)
+        customer = Ref()
+        customer.value = 1
+        customer.name = self.created_by.get_full_name()
+        customer.type = 'Customer'
+
+        line_items = []
+
+        for item in self.items.all():
+            line_detail = SalesItemLineDetail()
+            line_detail.UnitPrice = item.unit_cost  # in dollars
+            line_detail.Qty = item.quantity  # quantity can be decimal
+
+            line = SalesItemLine()
+            line.Amount = item.total_cost  # in dollars
+            line.SalesItemLineDetail = line_detail
+
+            line_items.append(line)
+
+        invoice = Invoice()
+        invoice.CustomerRef = customer
+        invoice.Line = line_items
+
+        session_manager = Oauth2SessionManager(
+            client_id=settings.QUICKBOOKS_COMPANY_ID,
+            client_secret=settings.QUICKBOOKS_SECRET,
+            access_token="eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..BjsTIBFjGLHae_XAS8KBYA.E0KUD8n2od3ZRZOzvk6uK_8rz3S6A9Agk2ZwRs9vWnrrPx__8heQl3eFd4yNAdgESb5CB63vHeDW4EGUy9djXKFYAIAWOAci-GHzmoYp1Q8R1TdHIbTRBTCdroMAvTPv3SSC5wiVd3xB4uYa9oUSSs1YKpoqlLynXof_nWMvRgk3td3CiNJUK-0TF5CrzijIb-346vrLnpSeNrwGmHPL-Tfwvu84W7J0nLbzOuZgX4YrhCmz4WhWrZj0IVPBEzPXYMeuysMHd8OQgd5nqSubbtGTtlmVoPrfXftRcRLsVaHoXMePxDHJ3O3nrq3IVBuuiE3IynBu1XWmPlBzRffRlxaB5XPamlPNuELCrSpI0CQQr4mD9ycvqcxw0TceMHefIU2lHnU7x9ua9elrMORmIvW78DfcxvMUVyqWdgF2dyaGpFwqH_eH68KPMh6yDlzN7D6F6l15PAXnzuMuUj3rriuAYRgtdsjeV6bE62j9TMn5FIPGX8j2b4xxJJYROAOBPB-9iy-pTXG823vHwWXaZ-9NgbmWHnGdp14v1PD6Rbo_A7Sx-wGvTOS1F3ExBaNFQE9y_Jt9XJ5eheINolPYbndCImm9rybHozhEnUQ81pQ_P13OvwRHheVxteZ9gPp-HsrdoD1j3P12NXTFCEX2wtfoqeTgkzoAM0Z2H615pWqRQ1l9BMer7t25WKjpjPIzIOtZqPvsnNpme-SPI46Fz-q8dgz7cJuWZm1hshPPdq4.PmzidBmNrD2dqV5zJnjacQ"
+        )
+        session_manager.start_session()
+
+
+        client = QuickBooks(
+            sandbox=True,
+            session_manager=session_manager,
+            consumer_key=settings.QUICKBOOKS_CLIENT_ID,
+            consumer_secret=settings.QUICKBOOKS_SECRET,
+            company_id=settings.QUICKBOOKS_COMPANY_ID,
+        )
+
+        invoice.save(qb=client)
 
     def __str__(self):
         return 'Order #' + str(self.pk)
