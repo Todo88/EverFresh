@@ -221,14 +221,10 @@ class FoodItem(models.Model):
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):
-        if self.unit == 'LB':
+        if self.unit == 'LB' or self.unit == 'lb' or self.unit == 'Pound' or self.unit == 'pound':
             return "Pounds"
-        if self.unit == 'Pound':
-            return "Pounds"
-        if self.unit == 'BU':
+        if self.unit == 'BU' or self.unit == 'bu' or self.unit == 'Bundle' or self.unit == 'bundle':
             return "Bundles"
-        if self.unit == 'Bundle':
-            return 'Bundles'
         if self.unit == 'HD':
             return "Heads"
         if self.unit == 'Head':
@@ -247,9 +243,9 @@ class FoodItem(models.Model):
             return self.unit
 
     def get_unit_succinct(self):
-        if self.unit == 'Pounds':
+        if self.unit == 'lb' or self.unit == 'Pound' or self.unit == 'pound':
             return 'LB'
-        if self.unit == 'Bundle':
+        if self.unit == 'bu' or self.unit == 'Bundle' or self.unit == 'bundle':
             return 'BU'
         if self.unit == 'Head':
             return 'HD'
