@@ -25,7 +25,7 @@
         }
 
         .ui.form {
-            margin-bottom: 4em;
+            margin-bottom: 5em;
         }
 
         .disabled {
@@ -181,11 +181,11 @@
                             <td class="right aligned two wide column">
                                 <div class="field">
                                     <div id="qty_id" class="ui right labeled input">
-                                        <input name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                        <input  name="food_item_{{ food_item.pk }}" type="number" min="1"
                                                max="999" class="right aligned">
-                                        <div id="mobile_qty_label"
+                                        <div data-tooltip="{{ food_item.get_unit_verbose }}" id="mobile_qty_label"
                                              class="ui right aligned basic label">
-                                            {{ food_item.unit }}s
+                                            {{ food_item.get_unit_succinct }}s
                                         </div>
                                     </div>
                                 </div>

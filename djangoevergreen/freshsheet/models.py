@@ -223,12 +223,44 @@ class FoodItem(models.Model):
     def get_unit_verbose(self):
         if self.unit == 'LB':
             return "Pounds"
+        if self.unit == 'Pound':
+            return "Pounds"
         if self.unit == 'BU':
             return "Bundles"
+        if self.unit == 'Bundle':
+            return 'Bundles'
         if self.unit == 'HD':
             return "Heads"
+        if self.unit == 'Head':
+            return 'Heads'
         if self.unit == 'C':
             return "Count"
+        if self.unit == 'QP':
+            return "Quarter Pounds"
+        if self.unit == 'Quarter Pound':
+            return 'Quarter Pounds'
+        if self.unit == 'Ten Count':
+            return 'Ten Counts'
+        if self.unit == '20CTs':
+            return "Twenty Counts"
+        else:
+            return self.unit
+
+    def get_unit_succinct(self):
+        if self.unit == 'Pounds':
+            return 'LB'
+        if self.unit == 'Bundle':
+            return 'BU'
+        if self.unit == 'Head':
+            return 'HD'
+        if self.unit == 'Count':
+            return 'CT'
+        if self.unit == 'Quarter Pound':
+            return 'Q LB'
+        if self.unit == 'Ten Count':
+            return '10 CT'
+        if self.unit == 'Twenty Count':
+            return '20 CT'
         else:
             return self.unit
 

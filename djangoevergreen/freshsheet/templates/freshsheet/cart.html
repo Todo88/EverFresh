@@ -31,12 +31,17 @@
         }
 
         #checkout {
-            margin: 1em;
+            margin: 1em 0 5em 0;
         }
 
         footer {
             position: absolute;
             margin-bottom: 0;
+        }
+
+        .ui.grid.margin-fix {
+            margin: 0 auto;
+            min-height: 400px;
         }
 
     </style>
@@ -67,7 +72,7 @@
     so we can always access the cart data no problem. We just want to update quantities
     on this page -->
 
-    <div class="ui grid">
+    <div class="ui grid margin-fix">
         <div class="ui row">
             <div class="centered twelve wide column">
                 <form method="post" action="{% url "update_cart" %}" class="ui form">
@@ -140,8 +145,6 @@
         </div>
     </div>
 
-
-    {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
     <script>
         $(document).ready(function () {
             $('#checkout').on('click', function () {
