@@ -31,13 +31,17 @@
     <style type="text/css">
         /* Padding for Title */
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             background-color: rgba(212, 208, 208, 0.23);
             margin: 0 auto;
         }
 
-        body.pushable>.pusher {
-            background-color: rgb(245, 244, 244)!important;
+        body.pushable > .pusher {
+            background-color: rgb(245, 244, 244) !important;
         }
 
         /* Make Vegetable names more easily readable in table */
@@ -185,7 +189,7 @@
         }
 
         .wrapper {
-            min-height: 80%;
+            min-height: 100vh;
         }
 
         footer a:focus {
@@ -194,14 +198,18 @@
         }
 
         footer {
-            bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            clear: both;
+            width: 100%;
         }
 
         @media only screen and (max-width: 991px) and (min-width: 768px) {
             .ui.container {
                 width: auto;
-                margin-left: 1em!important;
-                margin-right: 1em!important;
+                margin-left: 1em !important;
+                margin-right: 1em !important;
             }
         }
 
@@ -297,52 +305,51 @@
             {% endblock %}
 
         </div>
-    </div>
-</div>
-<div class="push"></div>
-<footer>
-    <div class="ui inverted vertical footer segment">
-        <div class="ui center aligned container">
-            <div class="ui stackable inverted divided grid">
-                <div class="five wide column">
-                    <h4 class="ui inverted header">Evergreen United</h4>
-                    <div class="ui inverted link list">
-                        <a href="https://www.eufoodhub.com" class="item">Visit our website for more information</a>
-                        <a href="/" class="item">Order from our freshsheet</a>
+        <footer>
+            <div class="ui inverted vertical footer segment">
+                <div class="ui center aligned container">
+                    <div class="ui stackable inverted divided grid">
+                        <div class="five wide column">
+                            <h4 class="ui inverted header">Evergreen United</h4>
+                            <div class="ui inverted link list">
+                                <a href="https://www.eufoodhub.com" class="item">Visit our website for more
+                                    information</a>
+                                <a href="/" class="item">Order from our freshsheet</a>
+                            </div>
+                        </div>
+                        <div class="three wide column">
+                            <h4 class="ui inverted header">Social Media</h4>
+                            <div class="ui inverted link list">
+                                <div><a href="https://www.instagram.com/evergreenunitedfoodhub/" class="sm item"><i
+                                        class="instagram icon"></i> Instagram</a></div>
+                                <div><a href="https://www.facebook.com/evergreenunitedfoodhub/" class="sm item"><i
+                                        class="facebook f icon"></i> Facebook</a></div>
+                            </div>
+                        </div>
+                        <div class="seven wide column">
+                            <h4 class="ui inverted header">Good food. Grown, prepared and enjoyed within 100 miles of
+                                Seattle.</h4>
+                            <p>Evergreen United Food Hub connects the Puget Sound's most pioneering chefs and farmers,
+                                pushing
+                                the boundaries of seasonality and diversity in the PNW while providing consistent local
+                                food
+                                service and emboldening our community foodshed. </p>
+                        </div>
                     </div>
-                </div>
-                <div class="three wide column">
-                    <h4 class="ui inverted header">Social Media</h4>
-                    <div class="ui inverted link list">
-                        <div><a href="https://www.instagram.com/evergreenunitedfoodhub/" class="sm item"><i
-                                class="instagram icon"></i> Instagram</a></div>
-                        <div><a href="https://www.facebook.com/evergreenunitedfoodhub/" class="sm item"><i
-                                class="facebook f icon"></i> Facebook</a></div>
-                    </div>
-                </div>
-                <div class="seven wide column">
-                    <h4 class="ui inverted header">Good food. Grown, prepared and enjoyed within 100 miles of
-                        Seattle.</h4>
-                    <p>Evergreen United Food Hub connects the Puget Sound's most pioneering chefs and farmers,
-                        pushing
-                        the boundaries of seasonality and diversity in the PNW while providing consistent local food
-                        service and emboldening our community foodshed. </p>
+                    <div class="ui inverted section divider"></div>
+                    <a href="/"><img src="{% static "images/Logo/EvergreenLogo.png" %}" class="ui centered tiny image"></a>
                 </div>
             </div>
-            <div class="ui inverted section divider"></div>
-            <a href="/"><img src="{% static "images/Logo/EvergreenLogo.png" %}" class="ui centered tiny image"></a>
-        </div>
+        </footer>
     </div>
-
-</footer>
-
+</div>
 <script>
 
     $(document).ready(function () {
         $('#hamburger_btn').on('click', function () {
             $('#hamburger_icons.sidebar')
                 .sidebar('setting', 'transition', 'overlay')
-                .sidebar('toggle')
+                .sidebar('attach events', $('#hamburger_btn'), 'toggle')
         })
     });
 

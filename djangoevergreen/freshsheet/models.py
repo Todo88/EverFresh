@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Create your models here.
 
@@ -11,6 +11,7 @@ from datetime import datetime
 # ------------------------------------------------------------------------------
 from django.template import loader
 from django.utils import timezone
+from django.utils.timezone import now
 
 
 class Farm(models.Model):
@@ -231,6 +232,10 @@ class FoodItem(models.Model):
         else:
             return self.unit
 
+    @property
+    def is_new(self):
+        return self.date_added > (now().date() - timedelta(days=14))
+
     def __str__(self):
         return self.name
 
@@ -316,27 +321,16 @@ class OrderItem(models.Model):
 
     @property
     def total_cost(self):
-        # NOT DRY AT ALL, NEEDS WORK ON LOGIC FOR CONDENSATION.
-        if self.item.case_count is None or self.item.wholesale_count is None:
-            if self.item.case_count is None and self.item.wholesale_count is None:
-                return self.item.price * self.quantity
-            if self.item.wholesale_count is not None:
-                if self.quantity >= self.item.wholesale_count and self.item.wholesale_count is not None:
-                    return self.item.wholesale_price * self.quantity
-            if self.item.case_count is not None:
-                if self.item.case_count <= self.quantity < self.item.wholesale_count and self.item.case_count is not None:
-                    return self.item.case_price * self.quantity
-                return self.item.price * self.quantity
-            else:
-                return self.item.price * self.quantity
 
-        if self.item.case_count is not None and self.item.wholesale_count is not None:
-            if self.quantity >= self.item.wholesale_count:
-                return self.quantity * self.item.wholesale_price
-            if self.item.case_count <= self.quantity < self.item.wholesale_count:
-                return self.quantity * self.item.case_price
-            if self.quantity < self.item.case_count:
-                return self.quantity * self.item.price
+        item = self.item
+        quantity = self.quantity
+
+        if item.wholesale_count and quantity >= item.wholesale_count:
+            return item.wholesale_price * quantity
+        elif item.case_count and quantity >= item.case_count:
+            return item.case_price * quantity
+        else:
+            return item.price * quantity
 
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:

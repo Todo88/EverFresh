@@ -24,6 +24,21 @@
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+        body {
+            height: auto;
+            min-height: 100%
+        }
+
+        #checkout {
+            margin: 1em;
+        }
+
+        footer {
+            position: absolute;
+            margin-bottom: 0;
+        }
+
     </style>
 {% endblock %}
 
@@ -116,7 +131,7 @@
                     </table>
                 </form>
 
-                <a style="margin-top: 1em;" href="{% url 'checkout' %}"
+                <a href="{% url 'checkout' %}"
                    id="checkout" class="right floated rounded ui yellow labeled icon button">
                     <i class="cart icon"></i>
                     Confirm Order
@@ -127,13 +142,13 @@
 
 
     {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
-<script>
-$(document).ready(function () {
-    $('#checkout').on('click', function(){
-        confirm('Are you sure you would like to place this order?')
-    })
-})
+    <script>
+        $(document).ready(function () {
+            $('#checkout').on('click', function () {
+                confirm('Are you sure you would like to place this order?')
+            })
+        })
 
-</script>
+    </script>
 {% endblock %}
 
