@@ -143,7 +143,7 @@
     <!-- Fresh Sheet Table -->
     <div><a href=".">Reset Sorting</a></div>
 
-    <form method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
+    <form id="freshsheet_form" method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
         {% csrf_token %}
         <div class="inner">
             <table class="ui sortable unstackable compact celled definition table">
@@ -171,7 +171,8 @@
                         <td class="hidden"></td>
                     </tr>
                     {% for food_item in items %}
-                        <tr onclick="$(this).find('input').focus()" class="food_item_row">
+                        <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                            class="food_item_row">
                             <td class="two wide column" id="product_name">
                                 {{ food_item.name }}
                             </td>
@@ -180,8 +181,9 @@
                             </td>
                             <td class="right aligned two wide column">
                                 <div class="field">
-                                    <div id="qty_id" class="ui right labeled input">
-                                        <input  name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                    <div id="qty_id"
+                                         class="ui right labeled {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                        <input name="food_item_{{ food_item.pk }}" type="number" min="1"
                                                max="999" class="right aligned">
                                         <div data-tooltip="{{ food_item.get_unit_verbose }}" id="mobile_qty_label"
                                              class="ui right aligned basic label">
@@ -236,8 +238,12 @@
 
     <script>
         $(document).ready(function () {
-            $("#add_items").click(function (event) {
+            var serialized_form = $('#freshsheet_form').serialize();
+            var prevent_unloader = false;
+
+            $("#freshsheet_form").submit(function (event) {
                 // your add_quantity function stuff here
+                prevent_unloader = true;
                 var quantity = $(event.target).parent().find('input').val();
                 $.get("/add_to_cart/" + this.dataset.itemId + "/" + quantity + "/" + "?freshsheet_pk={{ freshsheet.pk }}")
             });
@@ -246,6 +252,15 @@
 
             $('table th').click(function () {
                 $('.category_header').addClass('hidden')
+            });
+
+            $(window).bind('beforeunload', function (e) {
+                // e.preventDefault();
+                if (serialized_form != $('#freshsheet_form').serialize() && prevent_unloader === false) {
+                    return true;
+                } else {
+                    e = null;
+                }
             });
         });
     </script>

@@ -349,16 +349,12 @@ class OrderItem(models.Model):
 
     @property
     def total_cost(self):
-
-        item = self.item
-        quantity = self.quantity
-
-        if item.wholesale_count and quantity >= item.wholesale_count:
-            return item.wholesale_price * quantity
-        elif item.case_count and quantity >= item.case_count:
-            return item.case_price * quantity
+        if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
+            return self.item.wholesale_price * self.quantity
+        elif self.item.case_count and self.quantity >= self.item.case_count:
+            return self.item.case_price * self.quantity
         else:
-            return item.price * quantity
+            return self.item.price * self.quantity
 
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
@@ -418,11 +414,9 @@ class AccountRequest(models.Model):
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
     email_address = models.EmailField(verbose_name='Email', max_length=50)
     message_box = models.TextField(
-        verbose_name='Please leave a message with your needs, questions, etc.',
-        max_length=5000,
+        verbose_name='Message',
+        max_length=2000,
         default='',
-        null=True,
-        blank=True
     )
 
     def __str__(self):

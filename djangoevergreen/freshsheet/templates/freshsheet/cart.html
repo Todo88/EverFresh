@@ -75,9 +75,9 @@
     <div class="ui grid margin-fix">
         <div class="ui row">
             <div class="centered twelve wide column">
-                <form method="post" action="{% url "update_cart" %}" class="ui form">
+                <form id="cart_form" method="post" action="{% url "update_cart" %}" class="ui form">
                     {% csrf_token %}
-                    <table class="ui compact unstackable celled definition table">
+                    <table class="ui compact stackable celled definition table">
                         <thead class="full-width">
                         <tr>
                             <th style="font-size: 120%;" class="ten wide left aligned">Product</th>
@@ -103,7 +103,7 @@
                                                        min="1"
                                                        max="9999" class="right aligned"
                                                        value="{{ line.quantity }}">
-                                                <div style="width: 5em;" class="ui right aligned basic label">
+                                                <div style="width: auto;" class="ui right aligned basic label">
                                                     {{ line.item.get_unit_verbose }}
                                                 </div>
                                             </div>
@@ -147,8 +147,13 @@
 
     <script>
         $(document).ready(function () {
-            $('#checkout').on('click', function () {
-                confirm('Are you sure you would like to place this order?')
+            $('#checkout').submit(function () {
+                var confirmation = confirm('Are you sure you would like to place this order?');
+                if (confirmation) {
+                    $('#cart_form').submit()
+                } else {
+                    // Do not submit cart
+                }
             })
         })
 

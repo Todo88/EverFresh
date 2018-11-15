@@ -41,7 +41,16 @@
         }
 
         body.pushable > .pusher {
+            position: inherit;
             background-color: rgb(245, 244, 244) !important;
+        }
+
+        .sidebar {
+            z-index: 1001 !important;
+        }
+
+        #page-containers {
+            min-height: 60vh;
         }
 
         /* Make Vegetable names more easily readable in table */
@@ -299,7 +308,7 @@
             </div>
         </div>
 
-        <div class="ui container">
+        <div id="page-containers" class="ui container">
 
             {% block content %}
             {% endblock %}
@@ -346,11 +355,9 @@
 <script>
 
     $(document).ready(function () {
-        $('#hamburger_btn').on('click', function () {
-            $('#hamburger_icons.sidebar')
-                .sidebar('setting', 'transition', 'overlay')
-                .sidebar('attach events', $('#hamburger_btn'), 'toggle')
-        })
+        $('#hamburger_icons.sidebar')
+            .sidebar('attach events', '#hamburger_btn')
+            .sidebar('setting', 'transition', 'overlay')
     });
 
 </script>

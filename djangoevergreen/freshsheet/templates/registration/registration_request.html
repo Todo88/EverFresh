@@ -20,7 +20,7 @@
             width: 100%;
             font-size: 14px;
             border-radius: 5px;
-            border: solid grey 1px;
+            border: solid gainsboro 1px;
             height: 2em;
         }
 
@@ -54,42 +54,39 @@
             min-width: 150px;
         }
 
-        #id_message_box {
-            height: 5em;
-        }
     </style>
 
     <h1>Request an Account</h1>
-    <form method="post" action="">
+    <form class="ui form" method="post" action="">
         {% csrf_token %}
-        <p>
+        <div class="field">
             <label class="ui left floated" for="id_business_name">Business Name:</label>
             <input type="text" name="business_name" maxlength="40" required id="id_business_name"/>
-        </p>
-        <p>
+        </div>
+        <div class="field">
             <label for="id_business_address">Business Address:</label>
             <input type="text" name="business_address" maxlength="75" required id="id_business_address"/>
-        </p>
-        <p>
+        </div>
+        <div class="field">
             <label for="id_customer_name">Customer Name:</label>
             <input type="text" name="customer_name" maxlength="50" required id="id_customer_name"/>
-        </p>
-        <p>
+        </div>
+        <div class="field">
             <label for="id_customer_position">Job Title:</label>
             <input type="text" name="customer_position" maxlength="20" required id="id_customer_position"/>
-        </p>
-        <p>
+        </div>
+        <div class="field">
             <label for="id_phone_number">Phone Number:</label>
-            <input type="text" name="phone_number" maxlength="13" required id="id_phone_number"/>
-        </p>
-        <p>
+            <input type="text" name="phone_number" maxlength="15" required id="id_phone_number"/>
+        </div>
+        <div class="field">
             <label for="id_email_address">Email:</label>
             <input type="email" name="email_address" maxlength="50" required id="id_email_address"/>
-        </p>
-        <p>
+        </div>
+        <div class="field">
             <label for="id_message_box">Leave us a message, comment, or request:</label>
-            <input type="text" name="message_box" maxlength="5000" id="id_message_box"/>
-        </p>
+            <textarea type="text" name="message_box" maxlength="2000" id="id_message_box"></textarea>
+        </div>
         <button class="ui button" type="submit" value="{% trans 'Submit' %}">Request Account</button>
     </form>
 {% endblock %}
