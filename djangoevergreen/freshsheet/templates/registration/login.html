@@ -6,6 +6,9 @@
 
 {% block content %}
     <style>
+        #login_form {
+            margin-bottom: 50px;
+        }
 
         form input {
             background: transparent !important;
@@ -130,21 +133,7 @@
                 return (this.length === 0 || !this.trim());
             };
 
-            /*setTimeout(function() {
-                $('.input_coloring').each(function () {
-                    console.log(this.value)
-                    if (this.value.isEmpty()) {
-                        $(this).removeClass("green")
-                        $(this).addClass("grey")
-                    } else {
-                        $(this).removeClass("grey")
-                        $(this).addClass("green")
-                    }
-                })
-            }, 5000);*/
-
-
-            $('.input_coloring').change(function() {
+            $('.input_coloring').change(function () {
                 if (this.value.isEmpty()) {
                     $(this).removeClass("green")
                     $(this).addClass("grey")

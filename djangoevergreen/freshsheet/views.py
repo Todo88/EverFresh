@@ -316,7 +316,8 @@ class RequestAccountCreateView(CreateView):
         'customer_name',
         'customer_position',
         'phone_number',
-        'email_address'
+        'email_address',
+        'message_box',
     ]
     success_url = reverse_lazy('thanks')
 

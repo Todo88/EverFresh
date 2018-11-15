@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Create your models here.
 
@@ -221,16 +221,48 @@ class FoodItem(models.Model):
     date_added = models.DateField(auto_now_add=True)
 
     def get_unit_verbose(self):
-        if self.unit == 'LB':
+        if self.unit == 'LB' or self.unit == 'lb' or self.unit == 'Pound' or self.unit == 'pound':
             return "Pounds"
-        if self.unit == 'BU':
+        if self.unit == 'BU' or self.unit == 'bu' or self.unit == 'Bundle' or self.unit == 'bundle':
             return "Bundles"
         if self.unit == 'HD':
             return "Heads"
+        if self.unit == 'Head':
+            return 'Heads'
         if self.unit == 'C':
             return "Count"
+        if self.unit == 'QP':
+            return "Quarter Pounds"
+        if self.unit == 'Quarter Pound':
+            return 'Quarter Pounds'
+        if self.unit == 'Ten Count':
+            return 'Ten Counts'
+        if self.unit == '20CTs':
+            return "Twenty Counts"
         else:
             return self.unit
+
+    def get_unit_succinct(self):
+        if self.unit == 'lb' or self.unit == 'Pound' or self.unit == 'pound':
+            return 'LB'
+        if self.unit == 'bu' or self.unit == 'Bundle' or self.unit == 'bundle':
+            return 'BU'
+        if self.unit == 'Head':
+            return 'HD'
+        if self.unit == 'Count':
+            return 'CT'
+        if self.unit == 'Quarter Pound':
+            return 'Q LB'
+        if self.unit == 'Ten Count':
+            return '10 CT'
+        if self.unit == 'Twenty Count':
+            return '20 CT'
+        else:
+            return self.unit
+
+    @property
+    def is_new(self):
+        return self.date_added > (now().date() - timedelta(days=14))
 
     def __str__(self):
         return self.name
@@ -317,27 +349,12 @@ class OrderItem(models.Model):
 
     @property
     def total_cost(self):
-        # NOT DRY AT ALL, NEEDS WORK ON LOGIC FOR CONDENSATION.
-        if self.item.case_count is None or self.item.wholesale_count is None:
-            if self.item.case_count is None and self.item.wholesale_count is None:
-                return self.item.price * self.quantity
-            if self.item.wholesale_count is not None:
-                if self.quantity >= self.item.wholesale_count and self.item.wholesale_count is not None:
-                    return self.item.wholesale_price * self.quantity
-            if self.item.case_count is not None:
-                if self.item.case_count <= self.quantity < self.item.wholesale_count and self.item.case_count is not None:
-                    return self.item.case_price * self.quantity
-                return self.item.price * self.quantity
-            else:
-                return self.item.price * self.quantity
-
-        if self.item.case_count is not None and self.item.wholesale_count is not None:
-            if self.quantity >= self.item.wholesale_count:
-                return self.quantity * self.item.wholesale_price
-            if self.item.case_count <= self.quantity < self.item.wholesale_count:
-                return self.quantity * self.item.case_price
-            if self.quantity < self.item.case_count:
-                return self.quantity * self.item.price
+        if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
+            return self.item.wholesale_price * self.quantity
+        elif self.item.case_count and self.quantity >= self.item.case_count:
+            return self.item.case_price * self.quantity
+        else:
+            return self.item.price * self.quantity
 
     @property
     def unit_cost(self):
@@ -456,11 +473,9 @@ class AccountRequest(models.Model):
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
     email_address = models.EmailField(verbose_name='Email', max_length=50)
     message_box = models.TextField(
-        verbose_name='Please leave a message with your needs, questions, etc.',
-        max_length=5000,
+        verbose_name='Message',
+        max_length=2000,
         default='',
-        null=True,
-        blank=True
     )
 
     def __str__(self):

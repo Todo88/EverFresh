@@ -78,6 +78,7 @@
                                            class="hidden"
                                            value="{{ item.pk }}"
                                            {% if item in form.initial.items %}checked="checked"{% endif %}
+                                           {% if item.is_new %}checked="checked"{% endif %}
                                            {% if item.featured %}checked="checked"{% endif %}>
                                     <label for="food_item_{{ item.pk }}">{{ item }}</label>
                                 </div>

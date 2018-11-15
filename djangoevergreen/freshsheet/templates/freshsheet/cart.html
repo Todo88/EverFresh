@@ -24,6 +24,26 @@
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+        body {
+            height: auto;
+            min-height: 100%
+        }
+
+        #checkout {
+            margin: 1em 0 5em 0;
+        }
+
+        footer {
+            position: absolute;
+            margin-bottom: 0;
+        }
+
+        .ui.grid.margin-fix {
+            margin: 0 auto;
+            min-height: 400px;
+        }
+
     </style>
 {% endblock %}
 
@@ -52,12 +72,12 @@
     so we can always access the cart data no problem. We just want to update quantities
     on this page -->
 
-    <div class="ui grid">
+    <div class="ui grid margin-fix">
         <div class="ui row">
             <div class="centered twelve wide column">
-                <form method="post" action="{% url "update_cart" %}" class="ui form">
+                <form id="cart_form" method="post" action="{% url "update_cart" %}" class="ui form">
                     {% csrf_token %}
-                    <table class="ui compact unstackable celled definition table">
+                    <table class="ui compact stackable celled definition table">
                         <thead class="full-width">
                         <tr>
                             <th style="font-size: 120%;" class="ten wide left aligned">Product</th>
@@ -83,7 +103,7 @@
                                                        min="1"
                                                        max="9999" class="right aligned"
                                                        value="{{ line.quantity }}">
-                                                <div style="width: 5em;" class="ui right aligned basic label">
+                                                <div style="width: auto;" class="ui right aligned basic label">
                                                     {{ line.item.get_unit_verbose }}
                                                 </div>
                                             </div>
@@ -116,7 +136,7 @@
                     </table>
                 </form>
 
-                <a style="margin-top: 1em;" href="{% url 'checkout' %}"
+                <a href="{% url 'checkout' %}"
                    id="checkout" class="right floated rounded ui yellow labeled icon button">
                     <i class="cart icon"></i>
                     Confirm Order
@@ -125,15 +145,18 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function () {
+            $('#checkout').submit(function () {
+                var confirmation = confirm('Are you sure you would like to place this order?');
+                if (confirmation) {
+                    $('#cart_form').submit()
+                } else {
+                    // Do not submit cart
+                }
+            })
+        })
 
-    {#    <a href="{% url "checkout" %}" class="tiny ui green labeled icon submit button" type="submit">#}
-<script>
-$(document).ready(function () {
-    $('#checkout').on('click', function(){
-        confirm('Are you sure you would like to place this order?')
-    })
-})
-
-</script>
+    </script>
 {% endblock %}
 
