@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 # ------------------------------------------------------------------------------
 # Farms Database Input
 # ------------------------------------------------------------------------------
+from django.shortcuts import redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.timezone import now
@@ -423,7 +424,6 @@ class Order(models.Model):
             line_detail.UnitPrice = item.unit_cost  # in dollars
             line_detail.Qty = item.quantity  # quantity can be decimal
             line_detail.ServiceDate = now().date().isoformat()
-            print(line_detail.ServiceDate)
 
             line = SalesItemLine()
             line.Amount = item.total_cost  # in dollars
@@ -437,18 +437,18 @@ class Order(models.Model):
         invoice.Line = line_items
 
         session_manager = Oauth2SessionManager(
-            client_id=settings.QUICKBOOKS_COMPANY_ID,
-            client_secret=settings.QUICKBOOKS_SECRET,
-            access_token="eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..f3-SJtYnvofelNYvpEneZA.U4DYDqhqexkM_x1BgUZKa9WX007XkwwD8Tbs8HhS67xpNLGJjgDviMq4I2TbkgPEHU5gI6rdTrijCLBDGknDAUR5jkqTPwwWyrd5MOGgFoi2RC-lUplU5w6yLvoXAd9pd-2-KTrlLVsAtI65ef31nqtjyYGsRD-FQDQBvu-QZxyriMvi19d7FTUTVdqFY1E_pK7s1F7zazwg97oWqcuLM_l7DYJ1rIg3wc7d_u0Om1yX6zNjADTioHgNPFe7uVD-sOCUH4iYA8tvhqT5dlXfmJ0Dv26aThR5ObURWJIa7NgYARjNnFPT4OZNm29YaBxyt5iboB-dCVpxIiAfC2LFPaKVCqB-1Y6d14uTkLF_z4Vw2KICoaAUIzi7bdsHMzIk9Hq3ZfgH0n21i7mKlVaJtDwa2dP_xVX3PTmkkL1VDlq7xjZWZmC9ICKGgb7VsEwy7L8ll09Ht-TBvn7DtuGt0S6xeuvA3-ybTe-cmRmPvcXu58y_8ckyNnOUBKoAO7VQl7FHTegtnjKLsTxCbjivfLQdyayBl5r-ET15RguqGLYYD5xHRL5gqCc2o0BcdV9iOWvP1vcEVs_VlNYi-iFlezOnf4s3mfKRw5lFVC4z6BTRmcx6XJIE_Sn_6ofbyXR4ret1lDH0eIC7mqpSpVyKJAxQ4VikTYT2tQmt3A0A6TMNBu8It__CDvYXkn6rp-iMJ979GHGU_uCBTCfdYfY7PFj_eVdPnogoHTADT9kzGO4.aZTVxFsBuQ9D3EoosXBmHA",
-       )
-        session_manager.start_session()
+            client_id=settings.QUICKBOOKS_CLIENT_ID,
+            client_secret=settings.QUICKBOOKS_CLIENT_SECRET,
+            access_token="eyJraWQiOiJPUElDUFJEMDkxODIwMTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJkNzA1ZmZiMi1hYWQyLTRlMjItYjkzNy05MjIwOGQ4NmRmODEiLCJhdWQiOlsiUTA1ZHJiQWdHSktYV3ZnUFlUV1ZUSnJVbEFDZ3ZGeVJYcjRkTzczQktLR1YwaXY0ZmYiXSwicmVhbG1pZCI6IjEyMzE0NjE3NTUxNDI3OSIsImF1dGhfdGltZSI6MTU0MjMzMjkwNSwiaXNzIjoiaHR0cHM6XC9cL29hdXRoLnBsYXRmb3JtLmludHVpdC5jb21cL29wXC92MSIsImV4cCI6MTU0MjMzNjUyMSwiaWF0IjoxNTQyMzMyOTIxfQ.plmR6b6XX_3qaNE3hbQ7oGZKEgPVLwgpOXnSXrk6oq7_pUViebvnHai4ykveJuK-_nXrLDxKfkEj0C-8B-Ul30I-z78cDVpT08vtweqXjLqfakZaISKo0OcOGiAnUOGh1TgO2IdcVb0jjNtiaM1m-Z4oGEyJdgRkrbYFA1i-54c",
+        )
 
+        session_manager.start_session()
 
         client = QuickBooks(
             sandbox=True,
             session_manager=session_manager,
             consumer_key=settings.QUICKBOOKS_CLIENT_ID,
-            consumer_secret=settings.QUICKBOOKS_SECRET,
+            consumer_secret=settings.QUICKBOOKS_CLIENT_SECRET,
             company_id=settings.QUICKBOOKS_COMPANY_ID,
         )
 
@@ -480,3 +480,18 @@ class AccountRequest(models.Model):
 
     def __str__(self):
         return self.business_name
+
+
+# ------------------------------------------------------------------------------
+# Quickbooks
+# ------------------------------------------------------------------------------
+
+class Bearer:
+    def __init__(self, refreshExpiry, accessToken, tokenType, refreshToken, accessTokenExpiry, idToken=None):
+        self.refreshExpiry = refreshExpiry
+        self.accessToken = accessToken
+        self.tokenType = tokenType
+        self.refreshToken = refreshToken
+        self.accessTokenExpiry = accessTokenExpiry
+        self.idToken = idToken
+
