@@ -7,7 +7,7 @@ admin.site.register(FreshSheet)
 admin.site.register(Farm)
 admin.site.register(FoodItem)
 admin.site.register(OrderItem)
-admin.site.register(User, UserAdmin)
+admin.site.register(User)
 
 
 class OrderItemInline(admin.TabularInline):

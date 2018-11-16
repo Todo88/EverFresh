@@ -227,8 +227,8 @@ QUICKBOOKS_ENVIRONMENT = 'sandbox'
 
 # OAuth specific variables
 DISCOVERY_DOCUMENT = 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration/'
-CLIENT_ID = os.environ.get('QUICKBOOKS_CLIENT_ID')
-CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET')
+CLIENT_ID = QUICKBOOKS_CLIENT_ID
+CLIENT_SECRET = QUICKBOOKS_CLIENT_SECRET
 REDIRECT_URI = 'http://localhost:8000/authCodeHandler'
 ACCOUNTING_SCOPE = 'com.intuit.quickbooks.accounting'
 OPENID_SCOPES = ['openid', 'profile', 'email', 'phone', 'address']

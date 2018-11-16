@@ -143,7 +143,7 @@
     <div class="ui button"><a class="" href="{% url 'social:begin' 'intuit' %}">Connect with Quickbooks</a></div>
     <b>Connect To QuickBooks</b><br/>
     <a class="imgLink" href="#" onclick="launchPopup('/connectToQuickbooks/')">
-    Click
+        Click
     </a>
     <script>
         function launchPopup(path) {
@@ -153,6 +153,14 @@
             parameters += ",left=" + (screen.width - 800) / 2 + ",top=" + (screen.height - 650) / 2;
             // Launch Popup
             win = window.open(path, 'connectPopup', parameters);
+
+            checkConnect = setInterval(function () {
+                if (!win || !win.closed) {
+                    return;
+                }
+                clearInterval(checkConnect)
+                window.location.reload()
+            }, 100)
         }
     </script>
     <!-- Fresh Sheet Table -->

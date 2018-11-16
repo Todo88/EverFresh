@@ -406,7 +406,7 @@ class Order(models.Model):
             total_cost += item.total_cost
         return total_cost
 
-    def send_to_quickbooks(self):
+    def send_to_quickbooks(self, request):
         from quickbooks import QuickBooks, Oauth2SessionManager
         from quickbooks.objects import (Invoice,
                                         SalesItemLineDetail,
@@ -439,7 +439,8 @@ class Order(models.Model):
         session_manager = Oauth2SessionManager(
             client_id=settings.QUICKBOOKS_CLIENT_ID,
             client_secret=settings.QUICKBOOKS_CLIENT_SECRET,
-            access_token="eyJraWQiOiJPUElDUFJEMDkxODIwMTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJkNzA1ZmZiMi1hYWQyLTRlMjItYjkzNy05MjIwOGQ4NmRmODEiLCJhdWQiOlsiUTA1ZHJiQWdHSktYV3ZnUFlUV1ZUSnJVbEFDZ3ZGeVJYcjRkTzczQktLR1YwaXY0ZmYiXSwicmVhbG1pZCI6IjEyMzE0NjE3NTUxNDI3OSIsImF1dGhfdGltZSI6MTU0MjMzMjkwNSwiaXNzIjoiaHR0cHM6XC9cL29hdXRoLnBsYXRmb3JtLmludHVpdC5jb21cL29wXC92MSIsImV4cCI6MTU0MjMzNjUyMSwiaWF0IjoxNTQyMzMyOTIxfQ.plmR6b6XX_3qaNE3hbQ7oGZKEgPVLwgpOXnSXrk6oq7_pUViebvnHai4ykveJuK-_nXrLDxKfkEj0C-8B-Ul30I-z78cDVpT08vtweqXjLqfakZaISKo0OcOGiAnUOGh1TgO2IdcVb0jjNtiaM1m-Z4oGEyJdgRkrbYFA1i-54c",
+            access_token=request.user.qb_access_token,
+            refresh_token=request.user.qb_refresh_token,
         )
 
         session_manager.start_session()
@@ -463,6 +464,9 @@ class Order(models.Model):
 # ------------------------------------------------------------------------------
 class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+
+    qb_access_token = models.CharField(max_length=32, null=True, blank=True)
+    qb_refresh_token = models.CharField(max_length=32, null=True, blank=True)
 
 
 class AccountRequest(models.Model):

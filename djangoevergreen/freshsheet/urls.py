@@ -46,9 +46,9 @@ urlpatterns = [
     url(r'^(?i)getAppNow/?$', views.getAppNow, name='getAppNow'),
     url(r'^(?i)authCodeHandler/?$', views.authCodeHandler, name='authCodeHandler'),
     url(r'^(?i)disconnect/?$', views.disconnect, name='disconnect'),
-    url(r'^(?i)apiCall/?$', views.apiCall, name='apiCall'),
+    # url(r'^(?i)apiCall/?$', views.apiCall, name='apiCall'),
     url(r'^(?i)connected/?$', views.connected, name='connected'),
-    url(r'^(?i)refreshTokenCall/?$', views.refreshTokenCall, name='refreshTokenCall'),
+    # url(r'^(?i)refreshTokenCall/?$', views.refreshTokenCall, name='refreshTokenCall'),
 ]
 
 if settings.DEBUG:
