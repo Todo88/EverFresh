@@ -13,6 +13,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.timezone import now
+from quickbooks.objects import Account
 
 
 class Farm(models.Model):
@@ -360,12 +361,12 @@ class OrderItem(models.Model):
     @property
     def unit_cost(self):
         """Based on quantity/wholesale prices"""
-        if self.quantity >= self.item.wholesale_count:
+        if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
             return self.item.wholesale_price
-        if self.item.case_count <= self.quantity < self.item.wholesale_count:
+        if self.item.case_count and self.item.case_count <= self.quantity:
             return self.item.case_price
-        if self.quantity < self.item.case_count:
-            return self.item.price
+
+        return self.item.price
 
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
@@ -408,33 +409,17 @@ class Order(models.Model):
 
     def send_to_quickbooks(self, request):
         from quickbooks import QuickBooks, Oauth2SessionManager
-        from quickbooks.objects import (Invoice,
-                                        SalesItemLineDetail,
-                                        SalesItemLine,
-                                        Ref)
+        from quickbooks.objects import (Invoice, SalesItemLineDetail, SalesItemLine, Ref)
+        from quickbooks.objects.item import Item
+
         customer = Ref()
         customer.value = 1
         customer.name = self.created_by.get_full_name()
         customer.type = 'Customer'
 
+        account = Account()
+
         line_items = []
-
-        for item in self.items.all():
-            line_detail = SalesItemLineDetail()
-            line_detail.UnitPrice = item.unit_cost  # in dollars
-            line_detail.Qty = item.quantity  # quantity can be decimal
-            line_detail.ServiceDate = now().date().isoformat()
-
-            line = SalesItemLine()
-            line.Amount = item.total_cost  # in dollars
-            line.SalesItemLineDetail = line_detail
-            line.Description = 'Food, dude'
-
-            line_items.append(line)
-
-        invoice = Invoice()
-        invoice.CustomerRef = customer
-        invoice.Line = line_items
 
         session_manager = Oauth2SessionManager(
             client_id=settings.QUICKBOOKS_CLIENT_ID,
@@ -453,6 +438,37 @@ class Order(models.Model):
             company_id=settings.QUICKBOOKS_COMPANY_ID,
         )
 
+        for item in self.items.all():
+            item_lookup = Item.where(f"Name = '{item.item.name}'", qb=client)
+
+            if item_lookup:
+                product = item_lookup[0]
+            else:
+                product = Item()
+                product.Name = item.item.name
+                product.UnitPrice = item.unit_cost
+                product.Type = 'Inventory'
+                product.IncomeAccountRef = Account.where("AccountType = 'Income'", qb=client)[0].to_ref()
+                product.save(qb=client)
+
+            line_detail = SalesItemLineDetail()
+            line_detail.ItemRef = product.to_ref()
+            line_detail.UnitPrice = item.unit_cost  # in dollars
+            line_detail.Qty = item.quantity  # quantity can be decimal
+            line_detail.ServiceDate = now().date().isoformat()
+
+            line = SalesItemLine()
+            line.Id = '1'
+            line.Amount = item.total_cost  # in dollars
+            line.Description = item.item.name
+            line.SalesItemLineDetail = line_detail
+
+            line_items.append(line)
+
+        invoice = Invoice()
+        invoice.CustomerRef = customer
+        invoice.Line = line_items
+
         invoice.save(qb=client)
 
     def __str__(self):
@@ -465,8 +481,8 @@ class Order(models.Model):
 class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
 
-    qb_access_token = models.CharField(max_length=32, null=True, blank=True)
-    qb_refresh_token = models.CharField(max_length=32, null=True, blank=True)
+    qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
+    qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
 
 
 class AccountRequest(models.Model):
@@ -498,4 +514,3 @@ class Bearer:
         self.refreshToken = refreshToken
         self.accessTokenExpiry = accessTokenExpiry
         self.idToken = idToken
-
