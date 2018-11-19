@@ -52,6 +52,11 @@
             #add_items {
                 width: 100%;
             }
+
+            #product_name {
+                max-width: 200px;
+                overflow-x: auto;
+            }
         }
 
         td, th {
@@ -140,11 +145,9 @@
     <!--Page Title-->
     <h1> {{ freshsheet.published_at }} Fresh Sheet </h1>
 
-    <div class="ui button"><a class="" href="{% url 'social:begin' 'intuit' %}">Connect with Quickbooks</a></div>
-    <b>Connect To QuickBooks</b><br/>
-    <a class="imgLink" href="#" onclick="launchPopup('/connectToQuickbooks/')">
-        Click
-    </a>
+    <div class="ui button"><a class="imgLink" href="#" onclick="launchPopup('/connectToQuickbooks/')">Connect with
+        Quickbooks</a></div>
+
     <script>
         function launchPopup(path) {
             var win;
@@ -196,10 +199,10 @@
                     {% for food_item in items %}
                         <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
                             class="food_item_row">
-                            <td class="two wide column" id="product_name">
+                            <td class="one wide column" id="product_name">
                                 {{ food_item.name }}
                             </td>
-                            <td class="two wide column">
+                            <td class="one wide column">
                                 {{ food_item.farm }}
                             </td>
                             <td class="right aligned two wide column">

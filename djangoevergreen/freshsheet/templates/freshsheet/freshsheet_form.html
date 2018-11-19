@@ -63,7 +63,7 @@
             </div>
             <div class="ui table grid">
                 {% for category_name, items in food_item_groups.items %}
-                    <div class="four wide veggie column">
+                    <div class="sixteen wide mobile only five wide tablet only four wide computer only veggie column">
                         <label id="category">{{ category_name|capfirst }}</label>
                         <fieldset id="{{ forloop.counter }}">
                         <a rel="{{ forloop.counter }}" href="#select_all">Select All</a>
@@ -85,7 +85,6 @@
                             {% endfor %}
                         </fieldset>
                     </div>
-
                 {% endfor %}
             </div>
             <div id="left_align">

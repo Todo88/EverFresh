@@ -478,16 +478,12 @@ class Order(models.Model):
 # ------------------------------------------------------------------------------
 # Users
 # ------------------------------------------------------------------------------
-class User(AbstractUser, models.Model):
-    cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-
-    qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
-    qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
-
-
 class AccountRequest(models.Model):
     business_name = models.CharField(verbose_name='Business Name', max_length=40)
     business_address = models.CharField(verbose_name='Business Address', max_length=75)
+    business_city = models.CharField(verbose_name='City', max_length=25, default='')
+    business_state = models.CharField(verbose_name='State', max_length=15, default='')
+    business_zipcode = models.CharField(verbose_name='Zip Code', max_length=15, default='')
     customer_name = models.CharField(verbose_name='Customer Name', max_length=50)
     customer_position = models.CharField(verbose_name='Job Title', max_length=20)
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
@@ -502,9 +498,17 @@ class AccountRequest(models.Model):
         return self.business_name
 
 
+class User(AbstractUser, models.Model):
+    cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
+
+    qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
+    qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
+
 # ------------------------------------------------------------------------------
 # Quickbooks
 # ------------------------------------------------------------------------------
+
 
 class Bearer:
     def __init__(self, refreshExpiry, accessToken, tokenType, refreshToken, accessTokenExpiry, idToken=None):

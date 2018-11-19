@@ -6,40 +6,54 @@
 
 
 {% block content %}
+    <style>
+        .pusher {
+            overflow-x: auto !important;
+        }
+    </style>
     <div>
         <div style="padding-top: 0.5em; text-align: right; opacity: 0.2; font-size: 500%; font-weight: bolder;">
             ORDER
         </div>
-<!------------------------------------- Evergreen Logo, Contact info-------------------------------------->
+        <!------------------------------------- Evergreen Logo, Contact info-------------------------------------->
         <table>
-        <tbody style="height:20px;">
-        <tr style="">
-            <td><img src="{% static "images/Logo/EvergreenLogo.png" %}" style="height: 150px; width: 150px;"
-                     alt="Evergreen United"></td>
-            <td style="padding-left: 10px;"><br>Evergreen United<br>Shelton, WA 98584<br>555-555-5555<br><a href="https://www.eufoodhub.com/">https://www.eufoodhub.com/</a></td>
-            <td style="text-align:right;"><br><br><br><br></td>
-            <td style="text-align:right;"><br><br><br><br></td>
-            <td style="text-align:right;"><br><br><br><br></td>
+            <tbody style="height:20px;">
+            <tr style="">
+                <td><img src="{% static "images/Logo/EvergreenLogo.png" %}" style="height: 150px; width: 150px;"
+                         alt="Evergreen United"></td>
+                <td style="padding-left: 10px;"><br>Evergreen United<br>Shelton, WA 98584<br>555-555-5555<br><a
+                        href="https://www.eufoodhub.com/">https://www.eufoodhub.com/</a></td>
+                <td style="text-align:right;"><br><br><br><br></td>
+                <td style="text-align:right;"><br><br><br><br></td>
+                <td style="text-align:right;"><br><br><br><br></td>
 
-<!------------------------------------- ORDER DATE AND INVOICE NUMBER -------------------------------------->
-            <td style="text-align:right; width: 100em;"><br><br><br><br></td>
-            <td style="text-align:right;width:20em;"><br><br><br><div style="font-weight: bold;">ORDER DATE:</div><div style="font-weight: bold;">ORDER #:</div></td>
-            <td style="text-align:left; width: 20em;"><br><br><br><div>{{ invoice.order_date }}</div><div>{{ invoice.pk }}</div></td>
+                <!------------------------------------- ORDER DATE AND INVOICE NUMBER -------------------------------------->
+                <td style="text-align:right; width: 100em;"><br><br><br><br></td>
+                <td style="text-align:right;width:20em;"><br><br><br>
+                    <div style="font-weight: bold;">ORDER DATE:</div>
+                    <div style="font-weight: bold;">ORDER #:</div>
+                </td>
+                <td style="text-align:left; width: 20em;"><br><br><br>
+                    <div>{{ invoice.order_date }}</div>
+                    <div>{{ invoice.pk }}</div>
+                </td>
 
-        </tr>
-        </tbody>
+            </tr>
+            </tbody>
         </table>
     </div>
     <div class="ui divider"></div>
 
     <!------------------------------------- BILL TO -------------------------------------->
     <table>
-        <tbody><div style="font-weight: bolder;">BILL TO</div>
-    <tr>
-        <td>{{ invoice.created_by }}<br>[Company Name]<br>[Street Address]<br>[City, ST ZIP]<br>[Phone]<br>{{ invoice.created_by.email }}</td>
-        <td></td>
-    </tr>
-    </tbody>
+        <tbody>
+        <div style="font-weight: bolder;">BILL TO</div>
+        <tr>
+            <td>{{ invoice.created_by.req_info.customer_name }}<br>{{ invoice.created_by.req_info.business_name }}<br>{{ invoice.created_by.req_info.business_address }}<br>{{ invoice.created_by.req_info.business_city }}, {{ invoice.created_by.req_info.business_state }} {{ invoice.created_by.req_info.business_zipcode }}<br>{{ invoice.created_by.req_info.phone_number }}<br>{{ invoice.created_by.req_info.email }}
+            </td>
+            <td></td>
+        </tr>
+        </tbody>
     </table>
 
     <!-- This form is just for updating quantities. We store the cart in request.user
@@ -81,9 +95,9 @@
         </tfoot>
     </table>
 
-<div style="padding-bottom: 5em;">
+    <div style="padding-bottom: 5em;">
 
-</div>
+    </div>
 
 
 
