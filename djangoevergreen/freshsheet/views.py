@@ -316,6 +316,9 @@ class RequestAccountCreateView(CreateView):
     fields = [
         'business_name',
         'business_address',
+        'business_city',
+        'business_state',
+        'business_zipcode',
         'customer_name',
         'customer_position',
         'phone_number',
