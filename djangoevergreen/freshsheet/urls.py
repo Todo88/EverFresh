@@ -28,6 +28,7 @@ urlpatterns = [
     path('accounts/', include('registration.backends.default.urls')),
     path('accounts/registration_request', views.RequestAccountCreateView.as_view(), name='registration_request'),
     path('thanks/', views.thanks, name='thanks'),
+    path('management/', views.management, name='management'),
 
     # Logout and nicely redirect, normal logout does not redirect
     url(r'logout/', logout, {'next_page': settings.LOGIN_REDIRECT_URL}, name='logout'),
@@ -42,12 +43,13 @@ urlpatterns = [
 
     # Quickbooks handlers
     url(r'^(?i)connectToQuickbooks/?$', views.connectToQuickbooks, name='connectToQuickbooks'),
+    url(r'^(?i)importUsersFromQuickbooks/?$', views.importUsersFromQuickbooks, name='importUsersFromQuickbooks'),
     url(r'^(?i)signInWithIntuit/?$', views.signInWithIntuit, name='signInWithIntuit'),
     url(r'^(?i)getAppNow/?$', views.getAppNow, name='getAppNow'),
     url(r'^(?i)authCodeHandler/?$', views.authCodeHandler, name='authCodeHandler'),
     url(r'^(?i)disconnect/?$', views.disconnect, name='disconnect'),
-    # url(r'^(?i)apiCall/?$', views.apiCall, name='apiCall'),
     url(r'^(?i)connected/?$', views.connected, name='connected'),
+    # url(r'^(?i)apiCall/?$', views.apiCall, name='apiCall'),
     # url(r'^(?i)refreshTokenCall/?$', views.refreshTokenCall, name='refreshTokenCall'),
 ]
 

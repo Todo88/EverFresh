@@ -17,7 +17,7 @@ import logging
 import re
 
 
-from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm
+from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm, User
 import urllib
 
 from django.shortcuts import render, redirect
@@ -34,6 +34,9 @@ from .services import (
     validateJWTToken,
     revokeToken,
 )
+
+from .utils import get_qb_client
+from quickbooks.objects.customer import Customer
 
 
 def home(request):
@@ -226,7 +229,6 @@ def add_line_items_to_cart(request):
 
     return HttpResponseRedirect(reverse('cart'))
 
-
 # -----------------------------------------------------------------------------
 # Freshsheets
 # -----------------------------------------------------------------------------
@@ -305,6 +307,10 @@ class FreshSheetFormViewMixin:
 #         form = RequestAccount()
 #     return render(request, 'registration/registration_request.html', {'form': form})
 #
+
+def management(request):
+    return render(request, 'management.html')
+
 
 def thanks(request):
     return render(request, 'registration/thanks.html')
@@ -394,10 +400,36 @@ def upload_csv(request):
 
     return HttpResponseRedirect(reverse("list_freshsheets"))
 
-
 # ------------------------------------------
 #               QUICKBOOKS
 # ------------------------------------------
+
+
+def importUsersFromQuickbooks(request):
+    client = get_qb_client()
+    customers = Customer.all(qb=client)
+
+    for customer in customers:
+        if User.objects.filter(qb_customer_id=customer.Id).exists():
+            pass
+        else:
+            defaults = {'email': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+                        'first_name': customer.GivenName,
+                        'last_name': customer.FamilyName,
+                        'username': customer.GivenName + customer.FamilyName + customer.Id,
+                        'qb_customer_id': customer.Id
+                        }
+
+            User.objects.update_or_create(
+                defaults=defaults,
+                email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+                first_name=customer.GivenName,
+                last_name=customer.FamilyName,
+                username=customer.GivenName + customer.FamilyName + customer.Id,
+                qb_customer_id=customer.Id,
+            )
+
+    return render(request, 'management.html')
 
 
 def connectToQuickbooks(request):
@@ -518,8 +550,8 @@ def disconnect(request):
 #     address = company_info_response['CompanyInfo']['CompanyAddr']
 #     return HttpResponse('Company Name: ' + company_name + ', Company Address: ' + address['Line1'] + ', ' + address[
 #         'City'] + ', ' + ' ' + address['PostalCode'])
-#
-#
+
+
 def get_CSRF_token(request):
     token = request.session.get('csrfToken', None)
     if token is None:

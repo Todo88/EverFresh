@@ -15,6 +15,10 @@ from django.utils import timezone
 from django.utils.timezone import now
 from quickbooks.objects import Account
 
+from .utils import get_qb_client
+from quickbooks.objects import Invoice, SalesItemLineDetail, SalesItemLine, Ref
+from quickbooks.objects.item import Item
+
 
 class Farm(models.Model):
     # Example: Bloom Creek Cranberries, Little Rock, WA
@@ -408,35 +412,15 @@ class Order(models.Model):
         return total_cost
 
     def send_to_quickbooks(self, request):
-        from quickbooks import QuickBooks, Oauth2SessionManager
-        from quickbooks.objects import (Invoice, SalesItemLineDetail, SalesItemLine, Ref)
-        from quickbooks.objects.item import Item
-
         customer = Ref()
-        customer.value = 1
-        customer.name = self.created_by.get_full_name()
+        # customer.value = 1
+        customer.value = self.created_by.qb_customer_id
+        customer.name = self.created_by.req_info.business_name
         customer.type = 'Customer'
-
-        account = Account()
 
         line_items = []
 
-        session_manager = Oauth2SessionManager(
-            client_id=settings.QUICKBOOKS_CLIENT_ID,
-            client_secret=settings.QUICKBOOKS_CLIENT_SECRET,
-            access_token=request.user.qb_access_token,
-            refresh_token=request.user.qb_refresh_token,
-        )
-
-        session_manager.start_session()
-
-        client = QuickBooks(
-            sandbox=True,
-            session_manager=session_manager,
-            consumer_key=settings.QUICKBOOKS_CLIENT_ID,
-            consumer_secret=settings.QUICKBOOKS_CLIENT_SECRET,
-            company_id=settings.QUICKBOOKS_COMPANY_ID,
-        )
+        client = get_qb_client()
 
         for item in self.items.all():
             item_lookup = Item.where(f"Name = '{item.item.name}'", qb=client)
@@ -460,7 +444,8 @@ class Order(models.Model):
             line = SalesItemLine()
             line.Id = '1'
             line.Amount = item.total_cost  # in dollars
-            line.Description = item.item.name
+            line.Description = f"{item.quantity} {item.item.get_unit_verbose()} of {product.Name} from " \
+                               f"{item.item.farm}."
             line.SalesItemLineDetail = line_detail
 
             line_items.append(line)
@@ -502,8 +487,17 @@ class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
 
+    qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=False,
+                                      null=False)
+    qb_master_user = models.BooleanField(default=False, blank=True)
     qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
     qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if User.objects.filter(qb_master_user=True).exclude(pk=self.pk).exists() and self.qb_master_user:
+            raise Exception('Only one master user allowed.')
+        super().save(*args, **kwargs)
+
 
 # ------------------------------------------------------------------------------
 # Quickbooks
