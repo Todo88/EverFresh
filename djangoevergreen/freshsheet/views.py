@@ -24,7 +24,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.conf import settings
 
-from freshsheet import getDiscoveryDocument
+from djangoevergreen.freshsheet import getDiscoveryDocument
 from .services import (
     getCompanyInfo,
     getBearerTokenFromRefreshToken,
