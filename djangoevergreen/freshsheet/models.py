@@ -417,8 +417,8 @@ class Order(models.Model):
         customer = Ref()
         # customer.value = 1
         customer.value = self.created_by.qb_customer_id
-        customer.name = self.created_by.req_info.business_name
-        customer.type = 'Customer'
+        # customer.name = self.created_by.req_info.business_name
+        # customer.type = 'Customer'
 
         line_items = []
 

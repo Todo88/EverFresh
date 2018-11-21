@@ -420,6 +420,18 @@ def importUsersFromQuickbooks(request):
                         'qb_customer_id': customer.Id
                         }
 
+            # req_info = {'business_name': customer.FullyQualifiedName,
+            #             'business_address': customer.BillAddr.Line1,
+            #             'business_city': customer.BillAddr.City,
+            #             'business_state': customer.BillAddr.CountrySubDivisionCode,
+            #             'business_zipcode': customer.BillAddr.PostalCode,
+            #             'customer_name': customer.GivenName + ' ' + customer.FamilyName,
+            #             'customer_position': '',
+            #             'phone_number': customer.PrimaryPhone.FreeFormNumber,
+            #             'email_address': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+            #             }
+
+
             User.objects.update_or_create(
                 defaults=defaults,
                 email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
@@ -427,6 +439,7 @@ def importUsersFromQuickbooks(request):
                 last_name=customer.FamilyName,
                 username=customer.GivenName + customer.FamilyName + customer.Id,
                 qb_customer_id=customer.Id,
+                # req_info=req_info
             )
 
     return render(request, 'management.html')
