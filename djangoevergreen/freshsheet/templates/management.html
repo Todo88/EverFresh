@@ -14,8 +14,8 @@
             Try to break it and find it's wonky parts and we'll get them ironed out.
         </div>
     </div>
-    <div class="ui green button mgmt-btn">Import Users From Quickbooks<a
-            href="{% url 'importUsersFromQuickbooks' %}"></a>
+    <div onclick="location.href='{% url 'importUsersFromQuickbooks' %}'" class="ui green button mgmt-btn">Import Users From Quickbooks
+        <a href="#"></a>
     </div>
     <div onclick="launchPopup('{% url 'connectToQuickbooks' %}')" class="ui button mgmt-btn">Connect with
         Quickbooks<a class="imgLink" href="#"></a>
