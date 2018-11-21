@@ -487,8 +487,8 @@ class User(AbstractUser, models.Model):
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
 
-    qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=False,
-                                      null=False)
+    qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=True,
+                                      null=True)
     qb_master_user = models.BooleanField(default=False, blank=True)
     qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
     qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
