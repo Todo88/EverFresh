@@ -8,7 +8,7 @@ from datetime import datetime
 
 from django.conf import settings
 
-from djangoevergreen.freshsheet import getDiscoveryDocument
+from freshsheet import getDiscoveryDocument
 from .models import Bearer
 
 
