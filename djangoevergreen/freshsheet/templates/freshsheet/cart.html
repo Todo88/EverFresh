@@ -136,7 +136,7 @@
                     </table>
                 </form>
 
-                <a href="{% url 'checkout' %}"
+                <a onclick="confirmAction(event)" href="{% url 'checkout' %}"
                    id="checkout" class="right floated rounded ui yellow labeled icon button">
                     <i class="cart icon"></i>
                     Confirm Order
@@ -146,16 +146,14 @@
     </div>
 
     <script>
-        $(document).ready(function () {
-            $('#checkout').submit(function () {
-                var confirmation = confirm('Are you sure you would like to place this order?');
-                if (confirmation) {
-                    $('#cart_form').submit()
-                } else {
-                    // Do not submit cart
-                }
-            })
-        })
+        function confirmAction(event) {
+            var confirmation = confirm('Are you sure you would like to place this order?');
+            if (!confirmation) {
+                event.preventDefault();
+                location.reload();
+            }
+            return confirmation;
+        }
 
     </script>
 {% endblock %}

@@ -45,6 +45,10 @@
             list-style: none;
         }
 
+    #freshsheet-tbl {
+        margin-bottom: 40px;
+    }
+
     </style>
     <!-- Index -->
     <h1 class="massive">Fresh Sheet Index</h1>
@@ -67,7 +71,7 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <table class="ui unstackable table">
+    <table id="freshsheet-tbl" class="ui unstackable table">
         <thead>
         <tr>
             <th>Freshsheet Details</th>
@@ -78,7 +82,6 @@
         </thead>
         <tbody>
         {% for freshsheet in freshsheets reversed %}
-
             <tr>
                 <td>
                     <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh

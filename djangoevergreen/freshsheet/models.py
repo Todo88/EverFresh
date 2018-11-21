@@ -412,6 +412,8 @@ class Order(models.Model):
         return total_cost
 
     def send_to_quickbooks(self, request):
+        client = get_qb_client()
+
         customer = Ref()
         # customer.value = 1
         customer.value = self.created_by.qb_customer_id
@@ -419,8 +421,6 @@ class Order(models.Model):
         customer.type = 'Customer'
 
         line_items = []
-
-        client = get_qb_client()
 
         for item in self.items.all():
             item_lookup = Item.where(f"Name = '{item.item.name}'", qb=client)

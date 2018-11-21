@@ -23,7 +23,6 @@ urlpatterns = [
     url(r'^accounts/', include('registration.backends.default.urls')),
     path('', include('freshsheet.urls')),
     path(r'admin/', admin.site.urls),
-    url(r'', include('social_django.urls', namespace='social')),
 ]
 
 if settings.DEBUG:

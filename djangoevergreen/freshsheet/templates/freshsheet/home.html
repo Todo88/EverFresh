@@ -145,27 +145,6 @@
     <!--Page Title-->
     <h1> {{ freshsheet.published_at }} Fresh Sheet </h1>
 
-    <div class="ui button"><a class="imgLink" href="#" onclick="launchPopup('/connectToQuickbooks/')">Connect with
-        Quickbooks</a></div>
-
-    <script>
-        function launchPopup(path) {
-            var win;
-            var checkConnect;
-            var parameters = "location=1,width=800,height=650";
-            parameters += ",left=" + (screen.width - 800) / 2 + ",top=" + (screen.height - 650) / 2;
-            // Launch Popup
-            win = window.open(path, 'connectPopup', parameters);
-
-            checkConnect = setInterval(function () {
-                if (!win || !win.closed) {
-                    return;
-                }
-                clearInterval(checkConnect)
-                window.location.reload()
-            }, 100)
-        }
-    </script>
     <!-- Fresh Sheet Table -->
     <div><a href=".">Reset Sorting</a></div>
 
