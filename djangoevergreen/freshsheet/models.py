@@ -9,9 +9,15 @@ from datetime import datetime, timedelta
 # ------------------------------------------------------------------------------
 # Farms Database Input
 # ------------------------------------------------------------------------------
+from django.shortcuts import redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.timezone import now
+from quickbooks.objects import Account
+
+from .utils import get_qb_client
+from quickbooks.objects import Invoice, SalesItemLineDetail, SalesItemLine, Ref
+from quickbooks.objects.item import Item
 
 
 class Farm(models.Model):
@@ -356,6 +362,16 @@ class OrderItem(models.Model):
         else:
             return self.item.price * self.quantity
 
+    @property
+    def unit_cost(self):
+        """Based on quantity/wholesale prices"""
+        if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
+            return self.item.wholesale_price
+        if self.item.case_count and self.item.case_count <= self.quantity:
+            return self.item.case_price
+
+        return self.item.price
+
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
             return "Pounds"
@@ -395,6 +411,51 @@ class Order(models.Model):
             total_cost += item.total_cost
         return total_cost
 
+    def send_to_quickbooks(self, request):
+        client = get_qb_client()
+
+        customer = Ref()
+        # customer.value = 1
+        customer.value = self.created_by.qb_customer_id
+        customer.name = self.created_by.req_info.business_name
+        customer.type = 'Customer'
+
+        line_items = []
+
+        for item in self.items.all():
+            item_lookup = Item.where(f"Name = '{item.item.name}'", qb=client)
+
+            if item_lookup:
+                product = item_lookup[0]
+            else:
+                product = Item()
+                product.Name = item.item.name
+                product.UnitPrice = item.unit_cost
+                product.Type = 'Inventory'
+                product.IncomeAccountRef = Account.where("AccountType = 'Income'", qb=client)[0].to_ref()
+                product.save(qb=client)
+
+            line_detail = SalesItemLineDetail()
+            line_detail.ItemRef = product.to_ref()
+            line_detail.UnitPrice = item.unit_cost  # in dollars
+            line_detail.Qty = item.quantity  # quantity can be decimal
+            line_detail.ServiceDate = now().date().isoformat()
+
+            line = SalesItemLine()
+            line.Id = '1'
+            line.Amount = item.total_cost  # in dollars
+            line.Description = f"{item.quantity} {item.item.get_unit_verbose()} of {product.Name} from " \
+                               f"{item.item.farm}."
+            line.SalesItemLineDetail = line_detail
+
+            line_items.append(line)
+
+        invoice = Invoice()
+        invoice.CustomerRef = customer
+        invoice.Line = line_items
+
+        invoice.save(qb=client)
+
     def __str__(self):
         return 'Order #' + str(self.pk)
 
@@ -402,13 +463,12 @@ class Order(models.Model):
 # ------------------------------------------------------------------------------
 # Users
 # ------------------------------------------------------------------------------
-class User(AbstractUser, models.Model):
-    cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-
-
 class AccountRequest(models.Model):
     business_name = models.CharField(verbose_name='Business Name', max_length=40)
     business_address = models.CharField(verbose_name='Business Address', max_length=75)
+    business_city = models.CharField(verbose_name='City', max_length=25, default='')
+    business_state = models.CharField(verbose_name='State', max_length=15, default='')
+    business_zipcode = models.CharField(verbose_name='Zip Code', max_length=15, default='')
     customer_name = models.CharField(verbose_name='Customer Name', max_length=50)
     customer_position = models.CharField(verbose_name='Job Title', max_length=20)
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13)
@@ -421,3 +481,34 @@ class AccountRequest(models.Model):
 
     def __str__(self):
         return self.business_name
+
+
+class User(AbstractUser, models.Model):
+    cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
+
+    qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=False,
+                                      null=False)
+    qb_master_user = models.BooleanField(default=False, blank=True)
+    qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
+    qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if User.objects.filter(qb_master_user=True).exclude(pk=self.pk).exists() and self.qb_master_user:
+            raise Exception('Only one master user allowed.')
+        super().save(*args, **kwargs)
+
+
+# ------------------------------------------------------------------------------
+# Quickbooks
+# ------------------------------------------------------------------------------
+
+
+class Bearer:
+    def __init__(self, refreshExpiry, accessToken, tokenType, refreshToken, accessTokenExpiry, idToken=None):
+        self.refreshExpiry = refreshExpiry
+        self.accessToken = accessToken
+        self.tokenType = tokenType
+        self.refreshToken = refreshToken
+        self.accessTokenExpiry = accessTokenExpiry
+        self.idToken = idToken

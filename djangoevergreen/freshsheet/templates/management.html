@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% load evergreen_helpers %}
+
+{% block title %}EverFresh Cart{% endblock %}
+
+{% block content %}
+    <h1 class="manage-header">Manage Quickbooks</h1>
+    <div class="ui segment seg-wrap">
+        <div class="ted-msg">More stuff can be added here that we need for managing parts of the site. I just wanted to
+            get a
+            quick place where we can import users, connect with Quickbooks, etc. We'll need to play around with the site
+            a bunch.
+            Try to break it and find it's wonky parts and we'll get them ironed out.
+        </div>
+    </div>
+    <div class="ui green button mgmt-btn">Import Users From Quickbooks<a
+            href="{% url 'importUsersFromQuickbooks' %}"></a>
+    </div>
+    <div class="ui button mgmt-btn">Connect with
+        Quickbooks<a class="imgLink" href="#" onclick="launchPopup('/connectToQuickbooks/')"></a>
+    </div>
+
+    <style>
+        #page-containers {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .seg-wrap {
+            width: 650px;
+            margin: 20px auto !important;
+            justify-content: center;
+        }
+
+        .ted-msg {
+            padding: 15px;
+        }
+
+        .manage-header {
+            margin-bottom: 40px;
+        }
+    </style>
+
+    <script>
+        function launchPopup(path) {
+            var win;
+            var checkConnect;
+            var parameters = "location=1,width=800,height=650";
+            parameters += ",left=" + (screen.width - 800) / 2 + ",top=" + (screen.height - 650) / 2;
+            // Launch Popup
+            win = window.open(path, 'connectPopup', parameters);
+
+            checkConnect = setInterval(function () {
+                if (!win || !win.closed) {
+                    return;
+                }
+                clearInterval(checkConnect)
+                window.location.reload()
+            }, 100)
+        }
+    </script>
+{% endblock %}

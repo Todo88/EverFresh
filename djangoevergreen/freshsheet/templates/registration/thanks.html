@@ -3,7 +3,35 @@
 {% load evergreen_helpers %}
 
 {% block content %}
-    Your request has been sent to our Administrators and we will be reaching out
-    to fulfill your request as soon as possible. Please feel free to browse our
-    Freshsheet in the meantime.
+
+
+    <h1 class="manage-header">Thank you!</h1>
+    <div class="ui segment thanks-seg">
+        <div class="thankyou-msg">
+            Your request has been sent to our Administrators and we will be reaching out
+            to fulfill your request as soon as possible. Please feel free to browse our
+            Freshsheet in the meantime.
+        </div>
+    </div>
+
+    <style>
+        #page-containers {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .thanks-seg {
+            width: 650px;
+            margin: 20px auto !important;
+            justify-content: center;
+        }
+
+        .thankyou-msg {
+            padding: 15px;
+        }
+
+        .manage-header {
+            margin-bottom: 40px;
+        }
+    </style>
 {% endblock %}

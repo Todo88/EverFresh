@@ -1,11 +1,12 @@
 import csv
 from collections import OrderedDict
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError
 from django.urls import reverse, reverse_lazy
 from django.core.mail import send_mail
 from django.template import loader
@@ -14,7 +15,28 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
 import logging
 import re
-from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm
+
+
+from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm, User
+import urllib
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.conf import settings
+
+from freshsheet import getDiscoveryDocument
+from .services import (
+    getCompanyInfo,
+    getBearerTokenFromRefreshToken,
+    getUserProfile,
+    getBearerToken,
+    getSecretKey,
+    validateJWTToken,
+    revokeToken,
+)
+
+from .utils import get_qb_client
+from quickbooks.objects.customer import Customer
 
 
 def home(request):
@@ -43,6 +65,7 @@ def home(request):
         "processed_items": processed_items,
         "cart_quantities": cart_quantities,
     })
+
 
 # details must pass database info to call from database in details.html
 
@@ -148,6 +171,8 @@ def checkout(request):
     cart.status = "Pending"
     cart.save()
 
+    cart.send_to_quickbooks(request)
+
     # SEND EMAIL TO HUGH
     # send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
 
@@ -203,7 +228,6 @@ def add_line_items_to_cart(request):
             _add_to_cart(request.user, food_item_pk, value)
 
     return HttpResponseRedirect(reverse('cart'))
-
 
 # -----------------------------------------------------------------------------
 # Freshsheets
@@ -273,23 +297,6 @@ class FreshSheetFormViewMixin:
 
         return context
 
-        # # Get recent and non recent food items by doing opposite queries
-        # thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
-        # recent_food_items = FoodItem.objects.filter(date_added__gte=thirty_days_ago)
-        # non_recent_food_items = FoodItem.objects.exclude(date_added__gte=thirty_days_ago)
-        #
-        # # Add recent items to group
-        # context['food_item_groups'] = {
-        #     'recent': recent_food_items,
-        # }
-        #
-        # for item in non_recent_food_items:
-        #     if not context['food_item_groups'][item.category]:
-        #         context['food_item_groups'][item.category] = []
-        #     context['food_item_groups'][item.category].append(item)
-        #
-        # return context
-
 
 # def registration_request(request):
 #     if request.method == 'POST':
@@ -301,6 +308,10 @@ class FreshSheetFormViewMixin:
 #     return render(request, 'registration/registration_request.html', {'form': form})
 #
 
+def management(request):
+    return render(request, 'management.html')
+
+
 def thanks(request):
     return render(request, 'registration/thanks.html')
 
@@ -311,6 +322,9 @@ class RequestAccountCreateView(CreateView):
     fields = [
         'business_name',
         'business_address',
+        'business_city',
+        'business_state',
+        'business_zipcode',
         'customer_name',
         'customer_position',
         'phone_number',
@@ -345,7 +359,7 @@ def upload_csv(request):
             return HttpResponseRedirect(reverse("list_freshsheets"))
         # if file is too large, return
         if csv_file.multiple_chunks():
-            messages.error(request, "Uploaded file is too big (%.2f MB)." % (csv_file.size/(1000*1000),))
+            messages.error(request, "Uploaded file is too big (%.2f MB)." % (csv_file.size / (1000 * 1000),))
             return HttpResponseRedirect(reverse("list_freshsheets"))
 
         file_data = csv_file.read().decode("utf-8").splitlines()
@@ -381,7 +395,173 @@ def upload_csv(request):
             )
 
     except Exception as e:
-        logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
-        messages.error(request, "Unable to upload file. "+repr(e))
+        logging.getLogger("error_logger").error("Unable to upload file. " + repr(e))
+        messages.error(request, "Unable to upload file. " + repr(e))
 
     return HttpResponseRedirect(reverse("list_freshsheets"))
+
+# ------------------------------------------
+#               QUICKBOOKS
+# ------------------------------------------
+
+
+def importUsersFromQuickbooks(request):
+    client = get_qb_client()
+    customers = Customer.all(qb=client)
+
+    for customer in customers:
+        if User.objects.filter(qb_customer_id=customer.Id).exists():
+            pass
+        else:
+            defaults = {'email': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+                        'first_name': customer.GivenName,
+                        'last_name': customer.FamilyName,
+                        'username': customer.GivenName + customer.FamilyName + customer.Id,
+                        'qb_customer_id': customer.Id
+                        }
+
+            User.objects.update_or_create(
+                defaults=defaults,
+                email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+                first_name=customer.GivenName,
+                last_name=customer.FamilyName,
+                username=customer.GivenName + customer.FamilyName + customer.Id,
+                qb_customer_id=customer.Id,
+            )
+
+    return render(request, 'management.html')
+
+
+def connectToQuickbooks(request):
+    url = getDiscoveryDocument.auth_endpoint
+    params = {'scope': settings.ACCOUNTING_SCOPE, 'redirect_uri': settings.REDIRECT_URI,
+              'response_type': 'code', 'state': get_CSRF_token(request), 'client_id': settings.CLIENT_ID}
+    url += '?' + urllib.parse.urlencode(params)
+    return redirect(url)
+
+
+def signInWithIntuit(request):
+    url = getDiscoveryDocument.auth_endpoint
+    scope = ' '.join(settings.OPENID_SCOPES)  # Scopes are required to be sent delimited by a space
+    params = {'scope': scope, 'redirect_uri': settings.REDIRECT_URI,
+              'response_type': 'code', 'state': get_CSRF_token(request), 'client_id': settings.CLIENT_ID}
+    url += '?' + urllib.parse.urlencode(params)
+    return redirect(url)
+
+
+def getAppNow(request):
+    url = getDiscoveryDocument.auth_endpoint
+    scope = ' '.join(settings.GET_APP_SCOPES)  # Scopes are required to be sent delimited by a space
+    params = {'scope': scope, 'redirect_uri': settings.REDIRECT_URI,
+              'response_type': 'code', 'state': get_CSRF_token(request), 'client_id': settings.CLIENT_ID}
+    url += '?' + urllib.parse.urlencode(params)
+    return redirect(url)
+
+
+def authCodeHandler(request):
+    state = request.GET.get('state', None)
+    error = request.GET.get('error', None)
+    if error == 'access_denied':
+        return redirect('home')
+    if state is None:
+        return HttpResponseBadRequest()
+    elif state != get_CSRF_token(request):  # validate against CSRF attacks
+        return HttpResponse('unauthorized', status=401)
+
+    auth_code = request.GET.get('code', None)
+    if auth_code is None:
+        return HttpResponseBadRequest()
+
+    bearer = getBearerToken(auth_code)
+    realmId = request.GET.get('realmId', None)
+    updateSession(request, bearer.accessToken, bearer.refreshToken, realmId)
+
+    # Validate JWT tokens only for OpenID scope
+    if bearer.idToken is not None:
+        if not validateJWTToken(bearer.idToken):
+            return HttpResponse('JWT Validation failed. Please try signing in again.')
+        else:
+            return redirect('connected')
+    else:
+        return redirect('connected')
+
+
+def connected(request):
+    access_token = request.session.get('accessToken', None)
+    if access_token is None:
+        return HttpResponse('Your Bearer token has expired, please initiate Sign In With Intuit flow again')
+    refresh_token = request.session.get('refreshToken', None)
+
+    request.user.qb_access_token = access_token
+    request.user.qb_refresh_token = refresh_token
+    request.user.save()
+
+    return render(request, 'connected.html')
+
+
+def disconnect(request):
+    access_token = request.session.get('accessToken', None)
+    refresh_token = request.session.get('refreshToken', None)
+
+    revoke_response = ''
+    if access_token is not None:
+        revoke_response = revokeToken(access_token)
+    elif refresh_token is not None:
+        revoke_response = revokeToken(refresh_token)
+    else:
+        return HttpResponse('No accessToken or refreshToken found, Please connect again')
+
+    request.session.flush()
+    return HttpResponse(revoke_response)
+
+
+# def refreshTokenCall(request):
+#     refresh_token = request.session.get('refreshToken', None)
+#     if refresh_token is None:
+#         return HttpResponse('Not authorized')
+#     bearer = getBearerTokenFromRefreshToken(refresh_token)
+#
+#     if isinstance(bearer, str):
+#         return HttpResponse(bearer)
+#     else:
+#         return HttpResponse('Access Token: ' + bearer.accessToken + ', Refresh Token: ' + bearer.refreshToken)
+#
+#
+# def apiCall(request):
+#     access_token = request.session.get('accessToken', None)
+#     if access_token is None:
+#         return HttpResponse('Your Bearer token has expired, please initiate C2QB flow again')
+#
+#     realmId = request.session['realmId']
+#     if realmId is None:
+#         return HttpResponse('No realm ID. QBO calls only work if the accounting scope was passed!')
+#
+#     refresh_token = request.session['refreshToken']
+#     company_info_response, status_code = getCompanyInfo(access_token, realmId)
+#
+#     if status_code >= 400:
+#         # if call to QBO doesn't succeed then get a new bearer token from refresh token and try again
+#         bearer = getBearerTokenFromRefreshToken(refresh_token)
+#         updateSession(request, bearer.accessToken, bearer.refreshToken, realmId)
+#         company_info_response, status_code = getCompanyInfo(bearer.accessToken, realmId)
+#         if status_code >= 400:
+#             return HttpResponseServerError()
+#     company_name = company_info_response['CompanyInfo']['CompanyName']
+#     address = company_info_response['CompanyInfo']['CompanyAddr']
+#     return HttpResponse('Company Name: ' + company_name + ', Company Address: ' + address['Line1'] + ', ' + address[
+#         'City'] + ', ' + ' ' + address['PostalCode'])
+
+
+def get_CSRF_token(request):
+    token = request.session.get('csrfToken', None)
+    if token is None:
+        token = getSecretKey()
+        request.session['csrfToken'] = token
+    return token
+
+
+def updateSession(request, access_token, refresh_token, realmId, name=None):
+    request.session['accessToken'] = access_token
+    request.session['refreshToken'] = refresh_token
+    request.session['realmId'] = realmId
+    request.session['name'] = name

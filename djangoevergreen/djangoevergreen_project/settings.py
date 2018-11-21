@@ -13,12 +13,10 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse, reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -69,7 +67,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-ROOT_URLCONF = 'djangoevergreen.urls'
+ROOT_URLCONF = 'djangoevergreen_project.urls'
 
 # Data stored in secret_settings.py
 SECRET_KEY = os.getenv('SECRET_KEY', 'a-secret-key')
@@ -180,7 +178,6 @@ STATICFILES_DIRS = (
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
 REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 
-
 AUTH_USER_MODEL = 'freshsheet.User'
 LOGIN_REDIRECT_URL = reverse_lazy("home")
 
@@ -189,3 +186,53 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 # -----------------------------------------------------------------------------
 
 SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
+
+# -----------------------------------------------------------------------------
+# QUICKBOOKS
+# -----------------------------------------------------------------------------
+
+SOCIAL_AUTH_INTUIT_KEY = os.environ.get('SOCIAL_AUTH_INTUIT_KEY')
+SOCIAL_AUTH_INTUIT_SECRET = os.environ.get('SOCIAL_AUTH_INTUIT_SECRET')
+# SOCIAL_AUTH_INTUIT_ACCOUNTING_SCOPE = 'com.intuit.quickbooks.accounting'
+SOCIAL_AUTH_INTUIT_SCOPE = ['com.intuit.quickbooks.accounting', 'openid', 'profile', 'email', 'phone', 'address']
+# SOCIAL_AUTH_INTUIT_REDIRECT_URI = os.environ.get('SOCIAL_AUTH_INTUIT_REDIRECT_URI')
+SOCIAL_AUTH_INTUIT_REDIRECT_URI = 'http://localhost:8000/callback'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'freshsheet.oauth2config.OAuth2Config',
+)
+
+# SOCIAL_AUTH_INTUIT_LOGIN_REDIRECT_URL = '/logged-in/'
+# SOCIAL_AUTH_INTUIT_LOGIN_ERROR_URL = '/login-error/'
+# SOCIAL_AUTH_INTUIT_LOGIN_URL = '/login-url/'
+# SOCIAL_AUTH_INTUIT_NEW_USER_REDIRECT_URL = '/new-users-redirect-url/'
+# SOCIAL_AUTH_INTUIT_NEW_ASSOCIATION_REDIRECT_URL = '/new-association-redirect-url/'
+# SOCIAL_AUTH_INTUIT_DISCONNECT_REDIRECT_URL = '/account-disconnected-redirect-url/'
+# SOCIAL_AUTH_INTUIT_INACTIVE_USER_URL = '/inactive-user/'
+
+SOCIAL_AUTH_INTUIT_USER_MODEL = 'freshsheet.User'
+
+QUICKBOOKS_CLIENT_ID = os.environ.get('QUICKBOOKS_CLIENT_ID')
+QUICKBOOKS_CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET')
+QUICKBOOKS_REDIRECT_URI = os.environ.get('QUICKBOOKS_REDIRECT_URI')
+QUICKBOOKS_COMPANY_ID = os.environ.get('QUICKBOOKS_COMPANY_ID')
+QUICKBOOKS_ENVIRONMENT = 'sandbox'
+# DISCOVERY_DOCUMENT = 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration/'
+
+# OPENID_SCOPES = ['openid', 'profile', 'email', 'phone', 'address']
+# SANDBOX_QBO_BASEURL = 'https://sandbox-quickbooks.api.intuit.com'
+# SANDBOX_PROFILE_URL = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo'
+# ID_TOKEN_ISSUER = 'https://oauth.platform.intuit.com/op/v1'
+
+# OAuth specific variables
+DISCOVERY_DOCUMENT = 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration/'
+CLIENT_ID = QUICKBOOKS_CLIENT_ID
+CLIENT_SECRET = QUICKBOOKS_CLIENT_SECRET
+REDIRECT_URI = 'http://localhost:8000/authCodeHandler'
+ACCOUNTING_SCOPE = 'com.intuit.quickbooks.accounting'
+OPENID_SCOPES = ['openid', 'profile', 'email', 'phone', 'address']
+GET_APP_SCOPES = ['com.intuit.quickbooks.accounting', 'openid', 'profile', 'email', 'phone', 'address']
+SANDBOX_QBO_BASEURL = 'https://sandbox-quickbooks.api.intuit.com'
+SANDBOX_PROFILE_URL = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo'
+ID_TOKEN_ISSUER = 'https://oauth.platform.intuit.com/op/v1'

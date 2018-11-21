@@ -1,4 +1,4 @@
-{% extends "registration/registration_base.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 {% load staticfiles %}
 
@@ -96,7 +96,7 @@
     </style>
 
     <div class="ui centered grid">
-        <div class="nine wide column">
+        <div class="nine wide computer only twelve wide tablet only sixteen wide mobile only column">
             <div id="login_form" class="class ui center aligned segment">
                 <form id="login_form" class="form" method="post" action="">
                     {% csrf_token %}
