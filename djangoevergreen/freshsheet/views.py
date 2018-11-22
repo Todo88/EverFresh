@@ -16,7 +16,6 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 import logging
 import re
 
-
 from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm, User
 import urllib
 
@@ -229,6 +228,7 @@ def add_line_items_to_cart(request):
 
     return HttpResponseRedirect(reverse('cart'))
 
+
 # -----------------------------------------------------------------------------
 # Freshsheets
 # -----------------------------------------------------------------------------
@@ -400,6 +400,7 @@ def upload_csv(request):
 
     return HttpResponseRedirect(reverse("list_freshsheets"))
 
+
 # ------------------------------------------
 #               QUICKBOOKS
 # ------------------------------------------
@@ -410,37 +411,14 @@ def importUsersFromQuickbooks(request):
     customers = Customer.all(qb=client)
 
     for customer in customers:
-        if User.objects.filter(qb_customer_id=customer.Id).exists():
-            pass
-        else:
-            defaults = {'email': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
-                        'first_name': customer.GivenName,
-                        'last_name': customer.FamilyName,
-                        'username': customer.GivenName + customer.FamilyName + customer.Id,
-                        'qb_customer_id': customer.Id
-                        }
-
-            # req_info = {'business_name': customer.FullyQualifiedName,
-            #             'business_address': customer.BillAddr.Line1,
-            #             'business_city': customer.BillAddr.City,
-            #             'business_state': customer.BillAddr.CountrySubDivisionCode,
-            #             'business_zipcode': customer.BillAddr.PostalCode,
-            #             'customer_name': customer.GivenName + ' ' + customer.FamilyName,
-            #             'customer_position': '',
-            #             'phone_number': customer.PrimaryPhone.FreeFormNumber,
-            #             'email_address': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
-            #             }
-
-
-            User.objects.update_or_create(
-                defaults=defaults,
-                email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
-                first_name=customer.GivenName,
-                last_name=customer.FamilyName,
-                username=customer.GivenName + customer.FamilyName + customer.Id,
-                qb_customer_id=customer.Id,
-                # req_info=req_info
-            )
+        User.objects.update_or_create(
+            defaults={'qb_customer_id': customer.Id},
+            email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
+            first_name=customer.GivenName,
+            last_name=customer.FamilyName,
+            username=customer.GivenName + customer.FamilyName + customer.Id,
+            qb_customer_id=customer.Id,
+        )
 
     return render(request, 'management.html')
 
