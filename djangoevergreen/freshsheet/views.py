@@ -411,13 +411,13 @@ def importUsersFromQuickbooks(request):
     customers = Customer.all(qb=client)
 
     for customer in customers:
+        print(f"Looking up QB ID={customer.Id}. First name is {customer.GivenName}, Last is {customer.FamilyName}.")
         User.objects.update_or_create(
             defaults={'qb_customer_id': customer.Id},
             email=customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
             first_name=customer.GivenName,
             last_name=customer.FamilyName,
             username=customer.GivenName + customer.FamilyName + customer.Id,
-            qb_customer_id=customer.Id,
         )
 
     return render(request, 'management.html')
