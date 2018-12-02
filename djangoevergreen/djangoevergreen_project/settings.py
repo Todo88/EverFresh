@@ -191,13 +191,6 @@ SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
 # QUICKBOOKS
 # -----------------------------------------------------------------------------
 
-SOCIAL_AUTH_INTUIT_KEY = os.environ.get('SOCIAL_AUTH_INTUIT_KEY')
-SOCIAL_AUTH_INTUIT_SECRET = os.environ.get('SOCIAL_AUTH_INTUIT_SECRET')
-# SOCIAL_AUTH_INTUIT_ACCOUNTING_SCOPE = 'com.intuit.quickbooks.accounting'
-SOCIAL_AUTH_INTUIT_SCOPE = ['com.intuit.quickbooks.accounting', 'openid', 'profile', 'email', 'phone', 'address']
-# SOCIAL_AUTH_INTUIT_REDIRECT_URI = os.environ.get('SOCIAL_AUTH_INTUIT_REDIRECT_URI')
-SOCIAL_AUTH_INTUIT_REDIRECT_URI = 'http://localhost:8000/callback'
-
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'freshsheet.oauth2config.OAuth2Config',

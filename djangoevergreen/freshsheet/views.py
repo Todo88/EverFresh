@@ -507,17 +507,17 @@ def disconnect(request):
     return HttpResponse(revoke_response)
 
 
-# def refreshTokenCall(request):
-#     refresh_token = request.session.get('refreshToken', None)
-#     if refresh_token is None:
-#         return HttpResponse('Not authorized')
-#     bearer = getBearerTokenFromRefreshToken(refresh_token)
-#
-#     if isinstance(bearer, str):
-#         return HttpResponse(bearer)
-#     else:
-#         return HttpResponse('Access Token: ' + bearer.accessToken + ', Refresh Token: ' + bearer.refreshToken)
-#
+def refreshTokenCall(request):
+    refresh_token = request.session.get('refreshToken', None)
+    if refresh_token is None:
+        return HttpResponse('Not authorized')
+    bearer = getBearerTokenFromRefreshToken(refresh_token)
+
+    if isinstance(bearer, str):
+        return HttpResponse(bearer)
+    else:
+        return HttpResponse('Access Token: ' + bearer.accessToken + ', Refresh Token: ' + bearer.refreshToken)
+
 #
 # def apiCall(request):
 #     access_token = request.session.get('accessToken', None)

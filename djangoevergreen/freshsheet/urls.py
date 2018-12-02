@@ -50,7 +50,7 @@ urlpatterns = [
     url(r'^(?i)disconnect/?$', views.disconnect, name='disconnect'),
     url(r'^(?i)connected/?$', views.connected, name='connected'),
     # url(r'^(?i)apiCall/?$', views.apiCall, name='apiCall'),
-    # url(r'^(?i)refreshTokenCall/?$', views.refreshTokenCall, name='refreshTokenCall'),
+    url(r'^(?i)refreshTokenCall/?$', views.refreshTokenCall, name='refreshTokenCall'),
 ]
 
 if settings.DEBUG:
