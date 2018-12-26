@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.conf import settings
+from django.utils.timezone import now
 
 from quickbooks import QuickBooks, Oauth2SessionManager
 
@@ -15,8 +18,12 @@ def get_qb_client():
         refresh_token=master_user.qb_refresh_token,
     )
 
+    expire_time_with_buffer = (master_user.qb_expires_in or now()) - timedelta(seconds=60)
+    if now() > expire_time_with_buffer:
+        session_manager.refresh_access_tokens()
+        master_user.qb_expires_in = now() + timedelta(seconds=session_manager.expires_in)
+
     session_manager.start_session()
-    session_manager.refresh_access_tokens()
 
     master_user.qb_access_token = session_manager.access_token
     master_user.qb_refresh_token = session_manager.refresh_token

@@ -456,6 +456,13 @@ class Order(models.Model):
 
         invoice.save(qb=client)
 
+        # NOTE: If we try to just save the user model, it _could_ overwrite some Quickbooks auth settings.
+        # By getting a fresh model we'll for sure have the latest settings
+        fresh_user_model = User.objects.get(pk=request.user.pk)
+        fresh_user_model.cart = None
+        fresh_user_model.save()
+
+
     def __str__(self):
         return 'Order #' + str(self.pk)
 
@@ -490,6 +497,7 @@ class User(AbstractUser, models.Model):
     qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=True,
                                       null=True)
     qb_master_user = models.BooleanField(default=False, blank=True)
+    qb_expires_in = models.DateTimeField(null=True, blank=True)
     qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
     qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
 

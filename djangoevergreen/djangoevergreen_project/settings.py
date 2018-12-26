@@ -193,7 +193,7 @@ SECURE_SSL_REDIRECT = bool(os.getenv('SECURE_SSL_REDIRECT', False))
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'freshsheet.oauth2config.OAuth2Config',
+    # 'freshsheet.oauth2config.OAuth2Config',
 )
 
 SOCIAL_AUTH_INTUIT_USER_MODEL = 'freshsheet.User'

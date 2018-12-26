@@ -184,8 +184,8 @@ def checkout(request):
               ['myersb88@gmail.com'],
               fail_silently=False, html_message=html_message)
 
-    request.user.cart = None
-    request.user.save()
+    # request.user.cart = None
+    # request.user.save()
 
     # Send email
     print('Send Email Here')
@@ -486,6 +486,7 @@ def connected(request):
 
     request.user.qb_access_token = access_token
     request.user.qb_refresh_token = refresh_token
+    # TODO: Set expiry time
     request.user.save()
 
     return render(request, 'connected.html')
