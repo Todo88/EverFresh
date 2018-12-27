@@ -160,7 +160,7 @@
                     <th class="row-qty-cart right aligned">Qty. in Cart</th>
                     <th class="row-split right aligned">Split Cost</th>
                     <th class="row-case right aligned">Case Cost</th>
-                    <th class="row-WS right aligned">W.S. Cost</th>
+                    <th class="row-WS {% if request.user.is_authenticated %}right{% else %} center{% endif %} aligned">W.S. Cost</th>
                 </tr>
                 </thead>
                 <tbody>
