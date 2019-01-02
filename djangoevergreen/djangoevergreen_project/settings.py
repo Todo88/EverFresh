@@ -203,7 +203,7 @@ QUICKBOOKS_CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET')
 QUICKBOOKS_REDIRECT_URI = os.environ.get('QUICKBOOKS_REDIRECT_URI')
 QUICKBOOKS_COMPANY_ID = os.environ.get('QUICKBOOKS_COMPANY_ID')
 QUICKBOOKS_ENVIRONMENT = os.environ.get('QUICKBOOKS_ENVIRONMENT')
-SANDBOX_BOOLEAN = os.environ.get('SANDBOX_BOOLEAN')  # False is Production, True is Sandbox
+SANDBOX_BOOLEAN = bool(os.environ.get('SANDBOX_BOOLEAN', True))  # False is Production, True is Sandbox
 
 
 # OAuth specific variables
