@@ -203,6 +203,8 @@ QUICKBOOKS_CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET')
 QUICKBOOKS_REDIRECT_URI = os.environ.get('QUICKBOOKS_REDIRECT_URI')
 QUICKBOOKS_COMPANY_ID = os.environ.get('QUICKBOOKS_COMPANY_ID')
 QUICKBOOKS_ENVIRONMENT = os.environ.get('QUICKBOOKS_ENVIRONMENT')
+SANDBOX_BOOLEAN = os.environ.get('SANDBOX_BOOLEAN')  # False is Production, True is Sandbox
+
 
 # OAuth specific variables
 DISCOVERY_DOCUMENT = 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration/'
@@ -212,6 +214,6 @@ REDIRECT_URI = os.environ.get('REDIRECT_URI')
 ACCOUNTING_SCOPE = 'com.intuit.quickbooks.accounting'
 OPENID_SCOPES = ['openid', 'profile', 'email', 'phone', 'address']
 GET_APP_SCOPES = ['com.intuit.quickbooks.accounting', 'openid', 'profile', 'email', 'phone', 'address']
-SANDBOX_QBO_BASEURL = 'https://sandbox-quickbooks.api.intuit.com'
-SANDBOX_PROFILE_URL = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo'
+QBO_BASEURL = os.environ.get('QBO_BASEURL')
+PROFILE_URL = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo'
 ID_TOKEN_ISSUER = 'https://oauth.platform.intuit.com/op/v1'

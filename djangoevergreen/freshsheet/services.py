@@ -76,7 +76,7 @@ def getBearerTokenFromRefreshToken(refresh_Token):
 def getUserProfile(access_token):
     auth_header = 'Bearer ' + access_token
     headers = {'Accept': 'application/json', 'Authorization': auth_header, 'accept': 'application/json'}
-    r = requests.get(settings.SANDBOX_PROFILE_URL, headers=headers)
+    r = requests.get(settings.PROFILE_URL, headers=headers)
     status_code = r.status_code
     response = json.loads(r.text)
     return response, status_code
@@ -86,7 +86,7 @@ def getCompanyInfo(access_token, realmId):
     route = '/v3/company/{0}/companyinfo/{0}'.format(realmId)
     auth_header = 'Bearer ' + access_token
     headers = {'Authorization': auth_header, 'accept': 'application/json'}
-    r = requests.get(settings.SANDBOX_QBO_BASEURL + route, headers=headers)
+    r = requests.get(settings.QBO_BASEURL + route, headers=headers)
     status_code = r.status_code
     if status_code != 200:
         response = ''

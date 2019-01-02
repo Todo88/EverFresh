@@ -30,7 +30,7 @@ def get_qb_client():
     master_user.save()
 
     return QuickBooks(
-        sandbox=False,
+        sandbox=settings.SANDBOX_BOOLEAN,
         session_manager=session_manager,
         consumer_key=settings.QUICKBOOKS_CLIENT_ID,
         consumer_secret=settings.QUICKBOOKS_CLIENT_SECRET,
