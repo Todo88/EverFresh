@@ -205,7 +205,6 @@ QUICKBOOKS_COMPANY_ID = os.environ.get('QUICKBOOKS_COMPANY_ID')
 QUICKBOOKS_ENVIRONMENT = os.environ.get('QUICKBOOKS_ENVIRONMENT')
 IS_SANDBOX = bool(os.environ.get('IS_SANDBOX'))  # False is Production, True is Sandbox
 
-
 # OAuth specific variables
 DISCOVERY_DOCUMENT = 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration/'
 CLIENT_ID = QUICKBOOKS_CLIENT_ID
