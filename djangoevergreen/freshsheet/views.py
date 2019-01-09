@@ -405,7 +405,6 @@ def upload_csv(request):
 #               QUICKBOOKS
 # ------------------------------------------
 
-
 def importUsersFromQuickbooks(request):
     client = get_qb_client()
     customers = Customer.all(qb=client)
@@ -416,7 +415,22 @@ def importUsersFromQuickbooks(request):
 
             if ',' in emails:
                 for email in emails.split(","):
-                    email.strip()
+                    email = email.strip()
+
+                    if not User.objects.filter(email=email).exists():
+                        password = User.objects.make_random_password(length=8,
+                                                                     allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+                        created = User.objects.create_user(
+                            first_name=customer.GivenName,
+                            last_name=customer.FamilyName,
+                            email=email,
+                            qb_customer_id=customer.Id,
+                        )
+
+                        # TODO: Email raw password to the user on account creation
+                        #  so they can change it themselves.
+                        created.set_password(password)
+                        created.save()
             else:
                 email = emails
 
