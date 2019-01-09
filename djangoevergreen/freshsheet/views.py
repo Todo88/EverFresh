@@ -415,9 +415,8 @@ def importUsersFromQuickbooks(request):
 
             if ',' in emails:
                 for email in emails.split(","):
-                    email = email.strip()
-
-                    if not User.objects.filter(email=email).exists():
+                    email.strip()
+                    if not User.objects.filter(email=email).exists() and email is True:
                         password = User.objects.make_random_password(length=8,
                                                                      allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
                         created = User.objects.create_user(
@@ -434,7 +433,7 @@ def importUsersFromQuickbooks(request):
             else:
                 email = emails
 
-            if not User.objects.filter(email=email).exists():
+            if not User.objects.filter(email=email).exists() and email is True:
                 password = User.objects.make_random_password(length=8,
                                                              allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
                 created = User.objects.create_user(
