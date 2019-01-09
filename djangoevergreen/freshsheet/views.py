@@ -411,15 +411,31 @@ def importUsersFromQuickbooks(request):
     customers = Customer.all(qb=client)
 
     for customer in customers:
-        result, created = User.objects.update_or_create(
-            defaults={
-                'email': customer.PrimaryEmailAddr.Address if customer.PrimaryEmailAddr else '',
-                'first_name': customer.GivenName,
-                'last_name': customer.FamilyName,
-                'username': customer.GivenName + customer.FamilyName + customer.Id,
-            },
-            qb_customer_id=customer.Id,
-        )
+        if customer.PrimaryEmailAddr:
+            emails = customer.PrimaryEmailAddr.Address
+
+            if ',' in emails:
+                for email in emails.split(","):
+                    email.strip()
+            else:
+                email = emails
+
+            if not User.objects.filter(email=email).exists():
+                password = User.objects.make_random_password(length=8,
+                                                             allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+                created = User.objects.create_user(
+                    first_name=customer.GivenName,
+                    last_name=customer.FamilyName,
+                    email=email,
+                    qb_customer_id=customer.Id,
+                )
+
+                # TODO: Email raw password to the user on account creation
+                #  so they can change it themselves.
+                created.set_password(password)
+                created.save()
+        else:
+            continue
 
     return render(request, 'management.html')
 
@@ -518,6 +534,7 @@ def refreshTokenCall(request):
         return HttpResponse(bearer)
     else:
         return HttpResponse('Access Token: ' + bearer.accessToken + ', Refresh Token: ' + bearer.refreshToken)
+
 
 #
 # def apiCall(request):

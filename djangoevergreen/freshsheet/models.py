@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, UserManager, PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
 from datetime import datetime, timedelta
@@ -13,7 +14,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.timezone import now
-from quickbooks.objects import Account
+from quickbooks.objects import Account, CustomField
 
 from .utils import get_qb_client
 from quickbooks.objects import Invoice, SalesItemLineDetail, SalesItemLine, Ref
@@ -372,6 +373,25 @@ class OrderItem(models.Model):
 
         return self.item.price
 
+    @property
+    def unit_quantity(self):
+        """Returns the number of items required to achieve a different price point."""
+        if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
+            return ' Wholesale (' + str(self.item.wholesale_count) + '+)'
+        if self.item.case_count and self.item.case_count <= self.quantity:
+            return ' Case (' + str(self.item.case_count) + '+)'
+
+        return ''
+
+    # @property
+    # def costs(self):
+    #     """Returns (quantity_type, unit_cost, unit_quantity)"""
+    #     if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
+    #         return ('Wholesale', self.item.wholesale_count, self.quantity)
+    #     if self.item.case_count and self.item.case_count <= self.quantity:
+    #         return ('Case', self.item.case_count, self.quantity)
+    #     return ('', '', self.quantity)
+
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
             return "Pounds"
@@ -423,16 +443,16 @@ class Order(models.Model):
         line_items = []
 
         for item in self.items.all():
-            item_lookup = Item.where(f"Name = '{item.item.name}'", qb=client)
+            item_lookup = Item.where(f"Name = '{item.item.name}{item.unit_quantity}'", qb=client)
 
             if item_lookup:
                 product = item_lookup[0]
             else:
                 product = Item()
-                product.Name = item.item.name
+                product.Name = f"{item.item.name}{item.unit_quantity}"
                 product.UnitPrice = item.unit_cost
                 product.Type = 'Inventory'
-                product.IncomeAccountRef = Account.where("AccountType = 'Income'", qb=client)[0].to_ref()
+                product.IncomeAccountRef = Account.where("Name = 'Sales'", qb=client)[0].to_ref()
                 product.save(qb=client)
 
             line_detail = SalesItemLineDetail()
@@ -449,6 +469,10 @@ class Order(models.Model):
             line.SalesItemLineDetail = line_detail
 
             line_items.append(line)
+
+
+        # farm.name = item.item.farm
+        # farm.to_ref()
 
         invoice = Invoice()
         invoice.CustomerRef = customer
@@ -490,7 +514,74 @@ class AccountRequest(models.Model):
         return self.business_name
 
 
-class User(AbstractUser, models.Model):
+# class User(AbstractUser, models.Model):
+#     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+#     req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
+#
+#     qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=True,
+#                                       null=True)
+#     qb_master_user = models.BooleanField(default=False, blank=True)
+#     qb_expires_in = models.DateTimeField(null=True, blank=True)
+#     qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
+#     qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
+#
+#     def save(self, *args, **kwargs):
+#         if User.objects.filter(qb_master_user=True).exclude(pk=self.pk).exists() and self.qb_master_user:
+#             raise Exception('Only one master user allowed.')
+#         super().save(*args, **kwargs)
+
+
+class UserManager(BaseUserManager):
+    """Define a model manager for User model with no username field."""
+
+    use_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        """Create and save a User with the given email and password."""
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and save a regular User with the given email and password."""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """Create and save a SuperUser with the given email and password."""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    # Social needs the below setting. Username is not really set to UID.
+    USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
+    # Any User Attributes
+    username = None
+    email = models.EmailField(max_length=200, unique=True, null=True, blank=True)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
 

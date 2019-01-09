@@ -305,7 +305,7 @@
                             (${{ request.user.cart.order_total_cost }})
                         {% endif %}
                     </a>
-                    <a href="{% url "logout" %}" class="item ease">Hello {{ request.user.username }} Logout?</a>
+                    <a href="{% url "logout" %}" class="item ease">Logout?</a>
                 {% endif %}
                 {% if not request.user.is_authenticated %}
                     <a href="{% url "auth_login" %}" class="item ease">User Login</a>
