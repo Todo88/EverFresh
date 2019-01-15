@@ -412,6 +412,8 @@ class OrderItem(models.Model):
 class Order(models.Model):
     created_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateField('Date', auto_now_add=True)
+    freshsheet = models.ForeignKey(FreshSheet, on_delete=models.SET_NULL, null=True, blank=True,
+                                            related_name="orders")
     status = models.CharField(
         max_length=40,
         null=False,
@@ -432,6 +434,10 @@ class Order(models.Model):
         return total_cost
 
     def send_to_quickbooks(self, request):
+        # Before we ship to quickbooks, let's save the freshsheet used by this Order
+        self.freshsheet = FreshSheet.objects.latest('published_at')
+        self.save()
+
         client = get_qb_client()
 
         customer = Ref()
@@ -465,11 +471,10 @@ class Order(models.Model):
             line.Id = '1'
             line.Amount = item.total_cost  # in dollars
             line.Description = f"{item.quantity} {item.item.get_unit_verbose()} of {product.Name} from " \
-                               f"{item.item.farm}."
+                f"{item.item.farm}."
             line.SalesItemLineDetail = line_detail
 
             line_items.append(line)
-
 
         # farm.name = item.item.farm
         # farm.to_ref()
@@ -486,6 +491,14 @@ class Order(models.Model):
         fresh_user_model.cart = None
         fresh_user_model.save()
 
+    def send_to_ordersheet(self):
+        line_items = []
+
+        for item in self.items.all:
+            ordersheet_item_name = item.item.name
+            ordersheet_item_quantity = item.quantity
+            ordersheet_item_farm = item.item.farm
+            ordersheet_item_cost = item.total_cost
 
     def __str__(self):
         return 'Order #' + str(self.pk)
@@ -512,23 +525,6 @@ class AccountRequest(models.Model):
 
     def __str__(self):
         return self.business_name
-
-
-# class User(AbstractUser, models.Model):
-#     cart = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-#     req_info = models.ForeignKey(AccountRequest, on_delete=models.SET_NULL, null=True, blank=True)
-#
-#     qb_customer_id = models.CharField(verbose_name="Quickbooks ID Number", max_length=20, default="", blank=True,
-#                                       null=True)
-#     qb_master_user = models.BooleanField(default=False, blank=True)
-#     qb_expires_in = models.DateTimeField(null=True, blank=True)
-#     qb_access_token = models.CharField(max_length=2000, null=True, blank=True)
-#     qb_refresh_token = models.CharField(max_length=500, null=True, blank=True)
-#
-#     def save(self, *args, **kwargs):
-#         if User.objects.filter(qb_master_user=True).exclude(pk=self.pk).exists() and self.qb_master_user:
-#             raise Exception('Only one master user allowed.')
-#         super().save(*args, **kwargs)
 
 
 class UserManager(BaseUserManager):

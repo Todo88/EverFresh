@@ -254,6 +254,9 @@
         <a href="{% url "management" %}" class="item ease">
             Management
         </a>
+        <a href="{% url "order_sheets" %}" class="item ease">
+            Order Sheets
+        </a>
     {% endif %}
     {% if request.user.is_authenticated %}
         <a href="/cart" class="item ease {% if request.path == '/cart/' %}active{% endif %}">
@@ -296,6 +299,9 @@
                     <a href="{% url "management" %}"
                        class="item ease {% if request.path == '/management/' %}active{% endif %}">
                         Management
+                    </a>
+                    <a href="{% url "order_sheets" %}" class="item {% if request.path == '/freshsheets/order_sheets/' %}active{% endif %}ease">
+                        Order Sheets
                     </a>
                 {% endif %}
                 {% if request.user.is_authenticated %}

@@ -32,6 +32,7 @@ urlpatterns = [
     path('freshsheets/delete/<int:pk>', views.FreshSheetDeleteView.as_view(), name="delete_freshsheet"),
     path('freshsheets/publish/<int:pk>', views.publish, name="publish_freshsheet"),
     path('freshsheets/upload_csv/', views.upload_csv, name='upload_csv'),
+    path('freshsheets/order_sheets/', views.order_sheets, name='order_sheets'),
 
     # Quickbooks handlers
     url(r'^(?i)connectToQuickbooks/?$', views.connectToQuickbooks, name='connectToQuickbooks'),

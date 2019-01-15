@@ -7,19 +7,20 @@ admin.site.register(FreshSheet)
 admin.site.register(Farm)
 admin.site.register(FoodItem)
 admin.site.register(OrderItem)
+admin.site.register(Order)
 admin.site.register(User)
 
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 2
+# class OrderItemInline(admin.TabularInline):
+#     model = OrderItem
+#     extra = 2
 
 
-class OrderAdmin(admin.ModelAdmin):
-    fields = ['status']
-    inlines = [OrderItemInline]
-
-
-admin.site.register(Order, OrderAdmin)
+# class OrderAdmin(admin.ModelAdmin):
+#     fields = ['status']
+    # inlines = [OrderItemInline]
+#
+#
+# admin.site.register(Order, OrderAdmin)
 
 admin.site.register(AccountRequest)

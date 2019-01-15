@@ -70,6 +70,34 @@ def home(request):
 
 
 @login_required
+def order_sheets(request):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
+    #    orders = Order.objects.filter(freshsheet=FreshSheet.objects.last())
+
+    # orderitems = OrderItem.objects.filter(order_id__in=orders.values('id'))
+
+    # context = {"order_items": []}
+    #
+    # for orderitem in orderitems:
+    #     context = {
+    #
+    #     }
+    #     context["order_items"].append({
+    #         'id': id,
+    #         'name': orderitem.item,
+    #         'quantity': orderitem.quantity,
+    #         'price': orderitem.price,
+    #         'farm': orderitem.item.farm
+    #     })
+
+    return render(request, 'freshsheet/order_sheets.html', {
+        "orders": Order.objects.filter(freshsheet=FreshSheet.objects.last()),
+    })
+
+
+@login_required
 def cart(request):
     # NOTE: We don't need any context here because request.user.cart has all of the functions
     # and data we need
@@ -309,6 +337,9 @@ class FreshSheetFormViewMixin:
 #
 
 def management(request):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
     return render(request, 'management.html')
 
 

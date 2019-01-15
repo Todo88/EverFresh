@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load evergreen_helpers %}
+
+{% block content %}
+
+    <button class="ui button">Sort by Farm</button>
+    <button class="ui button">Sort by Customer</button>
+    <button class="ui button">Total Order</button>
+
+
+    {% for order in orders %}
+        {% if forloop.first %}
+            <div class="ui large centered header">{{ order.freshsheet.published_at }} Freshsheet Orders</div>
+        {% endif %}
+    {% endfor %}
+
+    <table class="ui sortable celled table">
+        <thead>
+        <tr>
+            <th>Quantity</th>
+            <th>Product</th>
+            <th>Farm</th>
+            <th>Customer</th>
+            <th>Item Price</th>
+            <th>Total Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+            {% for item in order.items.all %}
+                <tr>
+                    <td data-label="Product">{{ item.quantity }} {{ item.item.unit }}</td>
+                    <td data-label="Quantity">{{ item.item }}</td>
+                    <td data-label="Farm">{{ item.item.farm }}</td>
+                    <td data-label="Customer">{{ order.created_by.req_info.business_name }}</td>
+                    <td data-label="Price">{{ item.unit_cost }}</td>
+                    <td data-label="Price">{{ item.total_cost }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+    $(document).ready(function() {
+        $('table').tablesort()
+    })
+    </script>
+{% endblock %}
