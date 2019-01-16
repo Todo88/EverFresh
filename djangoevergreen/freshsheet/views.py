@@ -74,24 +74,6 @@ def order_sheets(request):
     if not request.user.is_staff or not request.user.is_superuser:
         raise PermissionDenied()
 
-    #    orders = Order.objects.filter(freshsheet=FreshSheet.objects.last())
-
-    # orderitems = OrderItem.objects.filter(order_id__in=orders.values('id'))
-
-    # context = {"order_items": []}
-    #
-    # for orderitem in orderitems:
-    #     context = {
-    #
-    #     }
-    #     context["order_items"].append({
-    #         'id': id,
-    #         'name': orderitem.item,
-    #         'quantity': orderitem.quantity,
-    #         'price': orderitem.price,
-    #         'farm': orderitem.item.farm
-    #     })
-
     return render(request, 'freshsheet/order_sheets.html', {
         "orders": Order.objects.filter(freshsheet=FreshSheet.objects.last()),
     })
@@ -293,10 +275,17 @@ def publish(request, pk):
         raise PermissionDenied()
 
     freshsheet = FreshSheet.objects.get(pk=pk)
+
     if freshsheet.published:
         return PermissionDenied("Cannot republish a freshsheet!")
+
     freshsheet.published = True
     freshsheet.save()
+
+    for user in User.objects.all():
+        user.cart = None
+        user.save()
+
     return HttpResponseRedirect(reverse("list_freshsheets"))
 
 

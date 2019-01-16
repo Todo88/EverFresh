@@ -413,7 +413,7 @@ class Order(models.Model):
     created_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateField('Date', auto_now_add=True)
     freshsheet = models.ForeignKey(FreshSheet, on_delete=models.SET_NULL, null=True, blank=True,
-                                            related_name="orders")
+                                   related_name="orders")
     status = models.CharField(
         max_length=40,
         null=False,
@@ -476,9 +476,6 @@ class Order(models.Model):
 
             line_items.append(line)
 
-        # farm.name = item.item.farm
-        # farm.to_ref()
-
         invoice = Invoice()
         invoice.CustomerRef = customer
         invoice.Line = line_items
@@ -490,15 +487,6 @@ class Order(models.Model):
         fresh_user_model = User.objects.get(pk=request.user.pk)
         fresh_user_model.cart = None
         fresh_user_model.save()
-
-    def send_to_ordersheet(self):
-        line_items = []
-
-        for item in self.items.all:
-            ordersheet_item_name = item.item.name
-            ordersheet_item_quantity = item.quantity
-            ordersheet_item_farm = item.item.farm
-            ordersheet_item_cost = item.total_cost
 
     def __str__(self):
         return 'Order #' + str(self.pk)
