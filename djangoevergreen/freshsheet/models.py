@@ -328,17 +328,17 @@ class FreshSheet(models.Model):
         if self.published:
             self.published_at = timezone.now()
 
-            for user in User.objects.all():
-                html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
-
-                send_mail(
-                    'test',
-                    'test content',
-                    user.email,
-                    [settings.DEFAULT_FROM_EMAIL],
-                    fail_silently=False,
-                    html_message=html_message
-                )
+            # for user in User.objects.all():
+            #     html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
+            #
+            #     send_mail(
+            #         'test',
+            #         'test content',
+            #         user.email,
+            #         [settings.DEFAULT_FROM_EMAIL],
+            #         fail_silently=False,
+            #         html_message=html_message
+            #     )
 
         return super().save(**kwargs)
 
