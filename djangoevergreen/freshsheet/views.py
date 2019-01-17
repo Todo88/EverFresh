@@ -1,33 +1,27 @@
 import csv
 from collections import OrderedDict
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.core.mail import send_mail
 from django.template import loader
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
 import logging
-import re
 
 from .models import FreshSheet, Order, FoodItem, OrderItem, AccountRequest, Farm, User
 import urllib
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
 
 from freshsheet import getDiscoveryDocument
 from .services import (
-    getCompanyInfo,
     getBearerTokenFromRefreshToken,
-    getUserProfile,
     getBearerToken,
     getSecretKey,
     validateJWTToken,
@@ -67,7 +61,6 @@ def home(request):
 
 
 # details must pass database info to call from database in details.html
-
 
 @login_required
 def order_sheets(request):
