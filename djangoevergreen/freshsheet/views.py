@@ -173,9 +173,6 @@ def checkout(request):
     if request.user.cart is None:
         return redirect('/')
 
-    # Remove from cart
-    # request.user.cart = request.user.cart().delete()
-    # request.user.cart = Order.objects.create(status='Pending', created_by=request.user)
     cart = request.user.cart
     cart.status = "Pending"
     cart.save()
@@ -190,15 +187,16 @@ def checkout(request):
 
     html_message = loader.render_to_string('freshsheet/invoice.html', {'invoice': cart})
 
-    send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'myersb88@gmail.com',
-              ['myersb88@gmail.com'],
-              fail_silently=False, html_message=html_message)
+    if request.user.email_to:
+        send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'myersb88@gmail.com',
+                  ['myersb88@gmail.com'],
+                  fail_silently=False, html_message=html_message)
 
     # request.user.cart = None
     # request.user.save()
 
     # Send email
-    print('Send Email Here')
+    print('Email sent')
     # return redirect(request, 'invoice')
     return redirect(reverse('invoice', kwargs={"order_pk": cart.pk}))
     # return HttpResponseRedirect(reverse('invoice', kwargs={"order_pk": request.user.cart.pk}))

@@ -328,17 +328,17 @@ class FreshSheet(models.Model):
         if self.published:
             self.published_at = timezone.now()
 
-            # for user in User.objects.all():
-            #     html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
-            #
-            #     send_mail(
-            #         'test',
-            #         'test content',
-            #         user.email,
-            #         [settings.DEFAULT_FROM_EMAIL],
-            #         fail_silently=False,
-            #         html_message=html_message
-            #     )
+            for user in User.objects.all():
+                html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
+                if user.email_to:
+                    send_mail(
+                        'test',
+                        'test content',
+                        user.email,
+                        [settings.DEFAULT_FROM_EMAIL],
+                        fail_silently=False,
+                        html_message=html_message
+                    )
 
         return super().save(**kwargs)
 
@@ -382,15 +382,6 @@ class OrderItem(models.Model):
             return ' Case (' + str(self.item.case_count) + '+)'
 
         return ''
-
-    # @property
-    # def costs(self):
-    #     """Returns (quantity_type, unit_cost, unit_quantity)"""
-    #     if self.item.wholesale_count and self.quantity >= self.item.wholesale_count:
-    #         return ('Wholesale', self.item.wholesale_count, self.quantity)
-    #     if self.item.case_count and self.item.case_count <= self.quantity:
-    #         return ('Case', self.item.case_count, self.quantity)
-    #     return ('', '', self.quantity)
 
     def get_unit_verbose(self):
         if self.item.unit == 'lb' and self.quantity >= 2:
@@ -560,6 +551,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Any User Attributes
     username = None
     email = models.EmailField(max_length=200, unique=True, null=True, blank=True)
+    email_to = models.BooleanField(default=False, null=False, blank=False)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
