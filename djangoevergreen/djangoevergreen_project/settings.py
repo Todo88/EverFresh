@@ -42,7 +42,6 @@ if not EMAIL_HOST:
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -51,8 +50,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'freshsheet',
-
     'registration',  # Put registration at the bottom so its templates are overridden
+    'django.contrib.admin',
 ]
 
 MIDDLEWARE = [
