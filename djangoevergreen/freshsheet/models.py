@@ -500,6 +500,8 @@ class AccountRequest(models.Model):
         verbose_name='Message',
         max_length=2000,
         default='',
+        blank=True,
+        null=True
     )
 
     def __str__(self):
