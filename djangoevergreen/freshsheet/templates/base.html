@@ -254,7 +254,7 @@
         <a href="{% url "management" %}" class="item ease">
             Management
         </a>
-        <a href="{% url "order_sheets" %}" class="item ease">
+        <a href="{% url "list_ordersheets" %}" class="item ease">
             Order Sheets
         </a>
     {% endif %}
@@ -300,7 +300,7 @@
                        class="item ease {% if request.path == '/management/' %}active{% endif %}">
                         Management
                     </a>
-                    <a href="{% url "order_sheets" %}" class="item {% if request.path == '/freshsheets/order_sheets/' %}active{% endif %}ease">
+                    <a href="{% url "list_ordersheets" %}" class="item {% if request.path == '/list_ordersheets/' %}active{% endif %}ease">
                         Order Sheets
                     </a>
                 {% endif %}

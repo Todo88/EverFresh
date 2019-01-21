@@ -7,7 +7,7 @@
     <button id="farm-button" class="ui button">Sort by Farm</button>
     <button id="customer-button" class="ui button">Sort by Customer</button>
     <button id="all-button" class="ui button">Total Order</button>
-
+    <button id="reset-button" class="ui button">Reset Sorting</button>
     {% for order in orders %}
         {% if forloop.first %}
             <div class="ui large centered header">{{ order.freshsheet.published_at }} Freshsheet Orders</div>
@@ -34,9 +34,13 @@
                     <td class="farm" data-label="Farm">{{ item.item.farm }}</td>
                     <td class="customer" data-label="Customer">{{ order.created_by.req_info.business_name }}</td>
                     <td class="item-price" data-label="Price">{{ item.unit_cost }}</td>
-                    <td class="total-price" data-label="Price">{{ item.total_cost }}</td>
+                    <td class="total-price" data-label="TotalPrice">{{ item.total_cost }}</td>
                 </tr>
             {% endfor %}
+            <tr id="total-row">
+                <td colspan="6" class="right aligned order-total" data-label="OrderPrice"><strong>Order Total:
+                    ${{ order.order_total_cost }}</strong></td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -47,22 +51,40 @@
             var customerSort = $('.customer, .total-price');
             var tableSort = $('#ordersheet-table').tablesort();
             var buttonSort = tableSort.data('tablesort');
+            var rowCount = document.getElementById('ordersheet-table').rows.length;
 
 
             $('#farm-button').on('click', function () {
-                customerSort.addClass('hidden');
-                if (farmSort.hasClass('hidden')) {
-                    farmSort.removeClass('hidden')
+                    $('.customer, .total-price').addClass('hidden');
+
+                    for (var i = 0; i < rowCount; i++) {
+                        var row = document.getElementById('total-row');
+                        if (row) {
+                            row.parentNode.removeChild(row);
+                        }
+                    }
+
+                    if (farmSort.hasClass('hidden')) {
+                        farmSort.removeClass('hidden')
+                    }
+                    buttonSort.sort($('th.product'));
+                    window.setTimeout(function () {
+                        buttonSort.sort($('th.farm'));
+                        console.log('---- Sorted by Farm ----')
+                    }, 200)
                 }
-                buttonSort.sort($('th.product'));
-                window.setTimeout(function () {
-                    buttonSort.sort($('th.farm'));
-                    console.log('---- Sorted by Farm ----')
-                }, 50)
-            });
+            );
 
             $('#customer-button').on('click', function () {
-                $('.item-price').addClass('hidden');
+                $('.item-price, .order-total').addClass('hidden');
+
+                for (var i = 0; i < rowCount; i++) {
+                    var row = document.getElementById('total-row');
+                    if (row) {
+                        row.parentNode.removeChild(row);
+                    }
+                }
+
                 if (customerSort.hasClass('hidden')) {
                     customerSort.removeClass('hidden')
                 }
@@ -70,17 +92,31 @@
                 window.setTimeout(function () {
                     buttonSort.sort($('th.customer'));
                     console.log('---- Sorted by Customer ----')
-                }, 50)
+                }, 200)
             });
 
             $('#all-button').on('click', function () {
-                $('#ordersheet-table th, #ordersheet-table td').removeClass('hidden')
+
+                for (var i = 0; i < rowCount; i++) {
+                    var row = document.getElementById('total-row');
+                    if (row) {
+                        row.parentNode.removeChild(row);
+                    }
+                }
+
+                $('#ordersheet-table th, #ordersheet-table td').removeClass('hidden');
+                $('.order-total').addClass('hidden');
                 buttonSort.sort($('th.product'));
                 window.setTimeout(function () {
                     buttonSort.sort($('th.customer'));
                     console.log('---- Sorted by Customer ----')
-                }, 50)
+                }, 100)
             });
+
+            $('#reset-button').on('click', function() {
+                // Refreshes window to reset table sorting
+                window.location.href = window.location.href
+            })
         })
     </script>
 
@@ -91,6 +127,10 @@
 
         #ordersheet-table {
             margin-bottom: 50px;
+        }
+
+        .order-total {
+            background-color: #eeeeee
         }
 
     </style>

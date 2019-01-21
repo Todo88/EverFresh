@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <!-- Index -->
+    <h1 class="massive">Order Sheet Index</h1>
+
+    <table id="freshsheet-tbl" class="ui unstackable table">
+        <thead>
+        <tr>
+            <th>Order Sheet Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ordersheet in ordersheets reversed %}
+            <tr>
+                <td>
+                    <strong><a href="{% url "ordersheets" ordersheet.pk %}">{{ ordersheet.created_at }} Fresh
+                        Sheet</a></strong>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

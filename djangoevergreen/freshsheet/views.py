@@ -63,12 +63,26 @@ def home(request):
 # details must pass database info to call from database in details.html
 
 @login_required
-def order_sheets(request):
+def list_ordersheets(request):
     if not request.user.is_staff or not request.user.is_superuser:
         raise PermissionDenied()
 
-    return render(request, 'freshsheet/order_sheets.html', {
-        "orders": Order.objects.filter(freshsheet=FreshSheet.objects.last()),
+    ordersheets = FreshSheet.objects.all()[:10]
+
+    context = {
+        'title': 'Latest Order Sheets',
+        'ordersheets': ordersheets,
+    }
+    return render(request, 'freshsheet/list_ordersheets.html', context)
+
+
+@login_required
+def ordersheets(request, pk):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise PermissionDenied()
+
+    return render(request, 'freshsheet/ordersheets.html', {
+        "orders": Order.objects.filter(freshsheet=FreshSheet.objects.get(pk=pk)),
     })
 
 
