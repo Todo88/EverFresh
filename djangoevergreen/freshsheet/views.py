@@ -356,6 +356,10 @@ class RequestAccountCreateView(CreateView):
         'email_address',
         'message_box',
     ]
+
+    send_mail('Everfresh Account Request', f"{fields['business_name']} has requested an account. Please do somethin'",
+              'eufoodhub@gmail.com', ['eufoodhub@gmail.com'], fail_silently=False)
+
     success_url = reverse_lazy('thanks')
 
 
