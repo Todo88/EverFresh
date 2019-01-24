@@ -346,6 +346,7 @@ def thanks(request):
 class RequestAccountCreateView(CreateView):
     model = AccountRequest
     template_name = 'registration/registration_request.html'
+    success_url = reverse_lazy('thanks')
     fields = [
         'business_name',
         'business_address',
@@ -359,12 +360,19 @@ class RequestAccountCreateView(CreateView):
         'message_box',
     ]
 
-    print('send email here')
-    # send_mail('Everfresh Account Request',
-    #           f"{AccountRequest.objects.all().last()} has requested an account. Please set it up to allow this person to view the freshsheet.",
-    #           'admin@everfresh.com', ['eufoodhub@gmail.com'], fail_silently=False)
+    def form_valid(self, form):
+        self.object = form.save()
 
-    success_url = reverse_lazy('thanks')
+        send_mail(
+            'Everfresh Account Request',
+            f"{self.object} has requested an account. Please set it up to allow this person to view the freshsheet.",
+            'admin@myeverfresh.com',
+            ['eufoodhub@gmail.com'],
+            fail_silently=False
+        )
+
+        super().form_valid()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class FreshSheetCreateView(FreshSheetFormViewMixin, CreateView):
