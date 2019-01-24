@@ -187,17 +187,16 @@ def checkout(request):
     cart.send_to_quickbooks(request)
 
     # SEND EMAIL TO HUGH
-    # send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
+    send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['eufoodhub@gmail.com'], fail_silently=False)
 
     # SEND EMAIL TO CUSTOMER
     # ex: send_mail('Subject here', 'Here is the message.', 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
 
     html_message = loader.render_to_string('freshsheet/invoice.html', {'invoice': cart})
 
-    if request.user.email_to:
-        send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'myersb88@gmail.com',
-                  ['myersb88@gmail.com'],
-                  fail_silently=False, html_message=html_message)
+    send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'Invoice@everfresh.com',
+              [f"{request.user.email}"],
+              fail_silently=False, html_message=html_message)
 
     # request.user.cart = None
     # request.user.save()
