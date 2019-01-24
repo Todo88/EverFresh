@@ -187,7 +187,8 @@ def checkout(request):
     cart.send_to_quickbooks(request)
 
     # SEND EMAIL TO HUGH
-    send_mail('ORDER CONFIRMATION' + 'Order' + cart.pk, 'Invoice@everfresh.com', ['eufoodhub@gmail.com'], fail_silently=False)
+    send_mail('ORDER CONFIRMATION' + 'Order' + str(cart.pk), 'Invoice@everfresh.com', ['eufoodhub@gmail.com'],
+              fail_silently=False)
 
     # SEND EMAIL TO CUSTOMER
     # ex: send_mail('Subject here', 'Here is the message.', 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
