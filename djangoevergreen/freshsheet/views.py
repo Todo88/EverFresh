@@ -186,14 +186,16 @@ def checkout(request):
 
     cart.send_to_quickbooks(request)
 
+    html_message = loader.render_to_string('freshsheet/invoice.html', {'invoice': cart})
+
     # SEND EMAIL TO HUGH
-    send_mail('ORDER CONFIRMATION' + 'Order' + str(cart.pk), 'Invoice@everfresh.com', ['eufoodhub@gmail.com'],
-              fail_silently=False)
+    send_mail('ORDER CONFIRMATION' + 'Order' + str(cart.pk),
+              f'{request.user.email} has made an order, please check quickbooks for details', 'Invoice@everfresh.com',
+              ['eufoodhub@gmail.com'],
+              fail_silently=False, html_message=html_message)
 
     # SEND EMAIL TO CUSTOMER
     # ex: send_mail('Subject here', 'Here is the message.', 'Invoice@everfresh.com', ['myersb88@gmail.com'], fail_silently=False)
-
-    html_message = loader.render_to_string('freshsheet/invoice.html', {'invoice': cart})
 
     send_mail('Order Confirmation', 'Thank you for your order. It\'ll be shipped in a jiffy', 'Invoice@everfresh.com',
               [f"{request.user.email}"],
@@ -357,9 +359,10 @@ class RequestAccountCreateView(CreateView):
         'message_box',
     ]
 
-    send_mail('Everfresh Account Request',
-              f"{AccountRequest.objects.all().last()} has requested an account. Please set it up to allow this person to view the freshsheet.",
-              'eufoodhub@gmail.com', ['eufoodhub@gmail.com'], fail_silently=False)
+    print('send email here')
+    # send_mail('Everfresh Account Request',
+    #           f"{AccountRequest.objects.all().last()} has requested an account. Please set it up to allow this person to view the freshsheet.",
+    #           'admin@everfresh.com', ['eufoodhub@gmail.com'], fail_silently=False)
 
     success_url = reverse_lazy('thanks')
 
