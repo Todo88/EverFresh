@@ -416,6 +416,7 @@ def upload_csv(request):
                 "account": row['Account'],
                 "type": row['Type'],
                 "farm": farm,
+                "featured": False
             }
 
             if 'Split' in row and row['Split']:
@@ -430,6 +431,8 @@ def upload_csv(request):
             if 'C/TH' in row and row['C/TH']:
                 defaults["wholesale_count"] = row['C/TH']
 
+            if 'Featured' in row and row['Featured']:
+                defaults['featured'] = True
 
             FoodItem.objects.update_or_create(
                 name=row['Item Name'],
