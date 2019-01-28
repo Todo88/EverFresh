@@ -279,6 +279,9 @@
             <a id="mobile_header_logo" href="/"><img src="{% static "/images/Logo/eu.png" %}"/>
             </a>
             <div style="margin-left: auto;" id="hamburger_btn" class="ui right">
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url "auth_login" %}" class="item ease">User Login</a>
+                {% endif %}
                 <a class="item">
                     <i class="sidebar icon"></i>
                     Menu
@@ -300,7 +303,8 @@
                        class="item ease {% if request.path == '/management/' %}active{% endif %}">
                         Management
                     </a>
-                    <a href="{% url "list_ordersheets" %}" class="item {% if request.path == '/list_ordersheets/' %}active{% endif %}ease">
+                    <a href="{% url "list_ordersheets" %}"
+                       class="item {% if request.path == '/list_ordersheets/' %}active{% endif %}ease">
                         Order Sheets
                     </a>
                 {% endif %}
@@ -316,7 +320,6 @@
                 {% if not request.user.is_authenticated %}
                     <a href="{% url "auth_login" %}" class="item ease">User Login</a>
                     <a href="{% url "registration_request" %}" class="item ease">Request Account</a>
-
                 {% endif %}
             </div>
         </div>
@@ -349,8 +352,7 @@
                             </div>
                         </div>
                         <div class="seven wide column">
-                            <h4 class="ui inverted header">Good food. Grown, prepared and enjoyed within 100 miles of
-                                Seattle.</h4>
+                            <h4 class="ui inverted header">Good food.</h4>
                             <p>Evergreen United Food Hub connects the Puget Sound's most pioneering chefs and farmers,
                                 pushing
                                 the boundaries of seasonality and diversity in the PNW while providing consistent local

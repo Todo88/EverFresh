@@ -7,7 +7,7 @@
     <!-- CSS -->
     <style>
         h1 {
-            alignment: center;
+            text-align: center;
         }
 
         #product_name {
@@ -155,12 +155,14 @@
                 <thead class="ui full-width">
                 <tr>
                     <th class="row-product left aligned">Product</th>
-                    <th class="row-farm left aligned">Farm</th>
                     <th class="row-quantity right aligned">Quantity</th>
                     <th class="row-qty-cart right aligned">Qty. in Cart</th>
+                    <th class="row-farm left aligned">Farm</th>
                     <th class="row-split right aligned">Split Cost</th>
                     <th class="row-case right aligned">Case Cost</th>
-                    <th class="row-WS {% if request.user.is_authenticated %}right{% else %} center{% endif %} aligned">W.S. Cost</th>
+                    <th class="row-WS {% if request.user.is_authenticated %}right{% else %} center{% endif %} aligned">
+                        W.S. Cost
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -181,9 +183,6 @@
                             <td class="one wide column" id="product_name">
                                 {{ food_item.name }}
                             </td>
-                            <td class="one wide column">
-                                {{ food_item.farm }}
-                            </td>
                             <td class="right aligned two wide column">
                                 <div class="field">
                                     <div id="qty_id"
@@ -198,6 +197,9 @@
                                 </div>
                             </td>
                             <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
+                            <td class="one wide column">
+                                {{ food_item.farm }}
+                            </td>
                             {% if request.user.is_authenticated %}
                                 <td data-value="{{ food_item.price }}" class="right aligned one wide column">
                                     ${{ food_item.price }}</td>
