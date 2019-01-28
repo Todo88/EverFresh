@@ -142,109 +142,332 @@
 
     </style>
 
+
+
     <!--Page Title-->
     <h1> {{ freshsheet.published_at }} Fresh Sheet </h1>
 
-    <!-- Fresh Sheet Table -->
-    <div><a href=".">Reset Sorting</a></div>
+    <div class="tab-menu ui pointing secondary menu">
+        <a class="active item" data-tab="first">Evergreen United</a>
+        <a class="item" data-tab="second">Cairnspring Mills</a>
+    </div>
+    <div class="ui active tab" data-tab="first">
 
-    <form id="freshsheet_form" method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
-        {% csrf_token %}
-        <div class="inner">
-            <table class="ui sortable unstackable compact celled definition table">
-                <thead class="ui full-width">
-                <tr>
-                    <th class="row-product left aligned">Product</th>
-                    <th class="row-farm left aligned">Farm</th>
-                    <th class="row-quantity right aligned">Quantity</th>
-                    <th class="row-qty-cart right aligned">Qty. in Cart</th>
-                    <th class="row-split right aligned">Split Cost</th>
-                    <th class="row-case right aligned">Case Cost</th>
-                    <th class="row-WS {% if request.user.is_authenticated %}right{% else %} center{% endif %} aligned">W.S. Cost</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Start sorting by Category -->
-                {% for category, items in processed_items.items %}
+        <!-- Fresh Sheet Table -->
+        <div><a href=".">Reset Sorting</a></div>
+
+        <form id="freshsheet_form" method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
+            {% csrf_token %}
+            <div class="inner">
+                <table class="ui sortable unstackable compact celled definition table">
+                    <thead class="ui full-width">
+                    <tr>
+                        <th class="row-product left aligned">Product</th>
+                        <th class="row-farm left aligned">Farm</th>
+                        <th class="row-quantity right aligned">Quantity</th>
+                        <th class="row-qty-cart right aligned">Qty. in Cart</th>
+                        <th class="row-split right aligned">Split Cost</th>
+                        <th class="row-case right aligned">Case Cost</th>
+                        <th class="row-WS {% if request.user.is_authenticated %}right{% else %} center{% endif %} aligned">
+                            W.S. Cost
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Start sorting by Category -->
+                    {% for category, items in processed_items.items %}
+                        <tr class="cat_header" style="border-left: none;">
+                            <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
+                            <td class="hidden"></td>
+                            <td class="hidden"></td>
+                            <td class="hidden"></td>
+                            <td class="hidden"></td>
+                            <td class="hidden"></td>
+                            <td class="hidden"></td>
+                        </tr>
+                        {% for food_item in items %}
+                            <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                                class="food_item_row">
+                                <td class="one wide column" id="product_name">
+                                    {{ food_item.name }}
+                                </td>
+                                <td class="one wide column">
+                                    {{ food_item.farm }}
+                                </td>
+                                <td class="right aligned two wide column">
+                                    <div class="field">
+                                        <div id="qty_id"
+                                             class="ui right labeled {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                            <input name="food_item_{{ food_item.pk }}" type="number" min="1"
+                                                   max="999" class="right aligned">
+                                            <div data-tooltip="{{ food_item.get_unit_verbose }}" id="mobile_qty_label"
+                                                 class="ui right aligned basic label">
+                                                {{ food_item.get_unit_succinct }}s
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
+                                {% if request.user.is_authenticated %}
+                                    <td data-value="{{ food_item.price }}" class="right aligned one wide column">
+                                        ${{ food_item.price }}</td>
+                                    {% if food_item.case_price == None %}
+                                        <td class="center aligned one wide column">--</td>
+                                    {% else %}
+                                        <td data-value="{{ food_item.case_price }}"
+                                            class="right aligned one wide column">
+                                            ${{ food_item.case_price }}
+                                            ({{ food_item.case_count }}+)
+                                        </td>
+                                    {% endif %}
+
+                                    {% if food_item.wholesale_price == None %}
+                                        <td class="center aligned one wide column">--</td>
+                                    {% else %}
+                                        <td data-value="food_item.wholesale_price"
+                                            class="right aligned one wide column">
+                                            ${{ food_item.wholesale_price }}
+                                            ({{ food_item.wholesale_count }}+)
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if not request.user.is_authenticated %}
+                                    <td class="center aligned one wide column">--</td>
+                                    <td class="center aligned one wide column">--</td>
+                                    <td class="center aligned three wide column">Login For Pricing</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if request.user.is_authenticated %}
+                <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
+                    Add to Cart
+                </button>
+            {% else %}
+                <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
+                    You must login to add items to cart
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="ui tab" data-tab="second">
+        <div><a href=".">Reset Sorting</a></div>
+
+        <form id="freshsheet_form" method="post" action="{% url "add_line_items_to_cart" %}" class="ui form">
+            {% csrf_token %}
+            <div class="inner">
+                <table class="ui sortable unstackable compact celled definition table">
+                    <thead class="ui full-width">
+                    <tr>
+                        <th class="row-product left aligned">Product</th>
+                        <th class="row-quantity right aligned">Quantity</th>
+                        <th class="row-qty-cart right aligned">Qty. in Cart</th>
+                        <th class="row-split center aligned">25 Pound Bag</th>
+                        <th class="row-case right aligned">50 Pound Bad</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Start sorting by Category -->
                     <tr class="cat_header" style="border-left: none;">
-                        <td colspan="7" id="category_header" class="category_header">{{ category }}</td>
-                        <td class="hidden"></td>
-                        <td class="hidden"></td>
+                        <td colspan="6" id="category_header" class="category_header">Responsibly Grown Conventional</td>
                         <td class="hidden"></td>
                         <td class="hidden"></td>
                         <td class="hidden"></td>
                         <td class="hidden"></td>
                     </tr>
-                    {% for food_item in items %}
-                        <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
-                            class="food_item_row">
-                            <td class="one wide column" id="product_name">
-                                {{ food_item.name }}
-                            </td>
-                            <td class="one wide column">
-                                {{ food_item.farm }}
-                            </td>
-                            <td class="right aligned two wide column">
-                                <div class="field">
-                                    <div id="qty_id"
-                                         class="ui right labeled {% if not request.user.is_authenticated %}disabled {% endif %}input">
-                                        <input name="food_item_{{ food_item.pk }}" type="number" min="1"
-                                               max="999" class="right aligned">
-                                        <div data-tooltip="{{ food_item.get_unit_verbose }}" id="mobile_qty_label"
-                                             class="ui right aligned basic label">
-                                            {{ food_item.get_unit_succinct }}s
-                                        </div>
-                                    </div>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Trail Blazer
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
                                 </div>
-                            </td>
-                            <td class="right aligned one wide column">{{ cart_quantities|get_item:food_item.pk|default_if_none:'' }}</td>
-                            {% if request.user.is_authenticated %}
-                                <td data-value="{{ food_item.price }}" class="right aligned one wide column">
-                                    ${{ food_item.price }}</td>
-                                {% if food_item.case_price == None %}
-                                    <td class="center aligned one wide column">--</td>
-                                {% else %}
-                                    <td data-value="{{ food_item.case_price }}" class="right aligned one wide column">
-                                        ${{ food_item.case_price }}
-                                        ({{ food_item.case_count }}+)
-                                    </td>
-                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$33.50</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Glacier Peak High Extraction
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$37.00</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Valley Cream Pastry Flour
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$36.00</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Edison Hard White Spring Wheat
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$37.50</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Hundo
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$31.75</td>
+                    </tr>
 
-                                {% if food_item.wholesale_price == None %}
-                                    <td class="center aligned one wide column">--</td>
-                                {% else %}
-                                    <td data-value="food_item.wholesale_price" class="right aligned one wide column">
-                                        ${{ food_item.wholesale_price }}
-                                        ({{ food_item.wholesale_count }}+)
-                                    </td>
-                                {% endif %}
-                            {% endif %}
-                            {% if not request.user.is_authenticated %}
-                                <td class="center aligned one wide column">--</td>
-                                <td class="center aligned one wide column">--</td>
-                                <td class="center aligned three wide column">Login For Pricing</td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% if request.user.is_authenticated %}
-            <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
-                Add to Cart
-            </button>
-        {% else %}
-            <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
-                You must login to add items to cart
-            </a>
-        {% endif %}
-    </form>
+                    <tr class="cat_header" style="border-left: none;">
+                        <td colspan="6" id="category_header" class="category_header">Organic</td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Organic Expresso Hard Red Spring Wheat
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$47.00</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Organic Whole Wheat Expresso Red Spring
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$42.00</td>
+                    </tr>
+                    <tr class="cat_header" style="border-left: none;">
+                        <td colspan="6" id="category_header" class="category_header">Premium Whole Grains</td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Yecora Rojo Hard Red Spring Wheat Berries
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$22.00</td>
+                    </tr>
+                    <tr {% if request.user.is_authenticated %}onclick="$(this).find('input').focus()"{% endif %}
+                        class="food_item_row">
+                        <td class="one wide column" id="product_name">
+                            Organic Edison HWS Wheat
+                        </td>
+                        <td class="right aligned two wide column">
+                            <div class="field">
+                                <div id="qty_id"
+                                     class="ui right {% if not request.user.is_authenticated %}disabled {% endif %}input">
+                                    <input name="food_item" type="number" min="1" max="999" class="right aligned">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned one wide column"></td>
+                        <td class="center aligned one wide column">--</td>
+                        <td class="right aligned one wide column">$28.00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% if request.user.is_authenticated %}
+                <button value="{{ line.pk }}" id="add_items" class="tiny ui green fluid button">
+                    Add to Cart
+                </button>
+            {% else %}
+                <a href="{% url "auth_login" %}" id="login_btn" class="tiny ui red fluid button">
+                    You must login to add items to cart
+                </a>
+            {% endif %}
+        </form>
+    </div>
 
     <script>
         $(document).ready(function () {
             var serialized_form = $('#freshsheet_form').serialize();
             var prevent_unloader = false;
+
+            $('.tab-menu .item').tab();
 
             $("#freshsheet_form").submit(function (event) {
                 // your add_quantity function stuff here

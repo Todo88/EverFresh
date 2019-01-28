@@ -92,7 +92,7 @@
         }
 
         .ui.secondary.menu {
-            margin: 1em 1em;
+            margin: 1em;
         }
 
         .ui.secondary.menu .active.item {
@@ -101,7 +101,7 @@
             outline: none;
         }
 
-        .ui.secondary.menu .active.item::after {
+        .navigation.ui.secondary.menu .active.item::after {
             border-radius: 0;
             padding-bottom: 2px;
             border-bottom: 3px solid rgb(95, 148, 68);
@@ -136,7 +136,7 @@
             outline: none;
         }
 
-        .ui.secondary.menu a.item:hover::after {
+        .navigation.ui.secondary.menu a.item:hover::after {
             border-radius: 0;
             font-weight: bold;
             padding-bottom: 2px;
@@ -152,7 +152,7 @@
             outline: none !important;
         }
 
-        .ui.secondary.menu a.item:focus::after {
+        .navigation.ui.secondary.menu a.item:focus::after {
             border-radius: 0;
             font-weight: bold;
             padding-bottom: 2px;
@@ -273,7 +273,7 @@
 </div>
 <div class="pusher">
     <div class="wrapper">
-        <div class="ui secondary menu">
+        <div class="ui navigation secondary menu">
             <a id="header_logo" href="/"><img src="{% static "/images/Logo/eufoodhub.png" %}"/>
             </a>
             <a id="mobile_header_logo" href="/"><img src="{% static "/images/Logo/eu.png" %}"/>

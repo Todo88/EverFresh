@@ -69,7 +69,7 @@
                         <a rel="{{ forloop.counter }}" href="#select_all">Select All</a>
                         <span>&emsp;</span>
                         <a rel="{{ forloop.counter }}" href="#select_none">Select None</a>
-                            {% for item in items %}
+                            {% for item in items|dictsort:"name" %}
                                 <div class="ui checkbox">
                                     <input name="items"
                                            id="food_item_{{ item.pk }}"
