@@ -427,8 +427,9 @@ def upload_csv(request):
             if 'Case' in row and row['Case']:
                 defaults["wholesale_price"] = row['Case']
 
-            if 'C/TH' in row or 'CA/TH' and row['C/TH'] or row['CA/TH']:
+            if 'C/TH' in row and row['C/TH']:
                 defaults["wholesale_count"] = row['C/TH']
+
 
             FoodItem.objects.update_or_create(
                 name=row['Item Name'],
