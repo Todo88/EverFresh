@@ -444,11 +444,14 @@ class Order(models.Model):
 
             if item_lookup:
                 product = item_lookup[0]
+                product.UnitPrice = item.unit_cost
+                product.Type = 'NonInventory'
+                product.save(qb=client)
             else:
                 product = Item()
                 product.Name = f"{item.item.name}{item.unit_quantity}"
                 product.UnitPrice = item.unit_cost
-                product.Type = 'Inventory'
+                product.Type = 'NonInventory'
                 product.IncomeAccountRef = Account.where("Name = 'Sales'", qb=client)[0].to_ref()
                 product.save(qb=client)
 

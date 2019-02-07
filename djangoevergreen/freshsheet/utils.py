@@ -35,4 +35,5 @@ def get_qb_client():
         consumer_key=settings.QUICKBOOKS_CLIENT_ID,
         consumer_secret=settings.QUICKBOOKS_CLIENT_SECRET,
         company_id=settings.QUICKBOOKS_COMPANY_ID,
+        minorversion=4
     )
