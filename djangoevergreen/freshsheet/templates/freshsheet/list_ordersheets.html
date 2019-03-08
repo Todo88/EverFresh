@@ -15,7 +15,7 @@
         {% for ordersheet in ordersheets reversed %}
             <tr>
                 <td>
-                    <strong><a href="{% url "ordersheets" ordersheet.pk %}">{{ ordersheet.created_at }} Fresh
+                    <strong><a href="{% url "ordersheets" ordersheet.pk %}">{{ ordersheet.delivery_date }} Fresh
                         Sheet</a></strong>
                 </td>
             </tr>

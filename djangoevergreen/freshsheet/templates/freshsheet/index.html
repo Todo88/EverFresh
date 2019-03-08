@@ -84,7 +84,7 @@
         {% for freshsheet in freshsheets reversed %}
             <tr>
                 <td>
-                    <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.created_at }} Fresh
+                    <strong><a href="{% url "detail_freshsheet" id=freshsheet.id %}">{{ freshsheet.delivery_date }} Fresh
                         Sheet</a></strong>
                 </td>
                 <td>

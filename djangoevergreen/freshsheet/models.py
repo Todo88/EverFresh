@@ -10,13 +10,11 @@ from datetime import datetime, timedelta
 # ------------------------------------------------------------------------------
 # Farms Database Input
 # ------------------------------------------------------------------------------
-from django.shortcuts import redirect
-from django.template import loader
 from django.utils import timezone
 from django.utils.timezone import now
-from quickbooks.objects import Account, CustomField
+from quickbooks.objects import Account
 
-from .utils import get_qb_client
+from .utils import get_qb_client, get_next_service_date
 from quickbooks.objects import Invoice, SalesItemLineDetail, SalesItemLine, Ref
 from quickbooks.objects.item import Item
 
@@ -320,14 +318,17 @@ class FreshSheet(models.Model):
     created_at = models.DateField(default=datetime.now, blank=True)
     published = models.BooleanField(default=False)
     published_at = models.DateField(null=True, blank=True)
+    delivery_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return str(self.created_at)
 
     def save(self, **kwargs):
-        if self.published:
-            self.published_at = timezone.now()
+        if not self.delivery_date:
+            self.delivery_date = get_next_service_date()
 
+        if self.published and not self.published_at:
+            self.published_at = timezone.now()
             # for user in User.objects.all():
             #     html_message = loader.render_to_string('freshsheet/details.html', {'freshsheet': self})
             #     if user.email_to:
@@ -446,6 +447,7 @@ class Order(models.Model):
                 product = item_lookup[0]
                 product.UnitPrice = item.unit_cost
                 product.Type = 'NonInventory'
+                product.IncomeAccountRef = Account.where("Name = 'Sales'", qb=client)[0].to_ref()
                 product.save(qb=client)
             else:
                 product = Item()
@@ -459,7 +461,13 @@ class Order(models.Model):
             line_detail.ItemRef = product.to_ref()
             line_detail.UnitPrice = item.unit_cost  # in dollars
             line_detail.Qty = item.quantity  # quantity can be decimal
-            line_detail.ServiceDate = now().date().isoformat()
+
+            # Need to change this date to be the DELIVERY DATE of shipment,
+            # not the date on which it was created
+
+            # Check if it's between Sunday and Tuesday (Yields Tuesday date().isoformat())
+            # Check if it's between Wednesday and Friday (Yields Friday date().isoformat())
+            line_detail.ServiceDate = get_next_service_date().isoformat()
 
             line = SalesItemLine()
             line.Id = '1'

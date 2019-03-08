@@ -143,8 +143,8 @@
     </style>
 
     <!--Page Title-->
-    <h1> {{ freshsheet.published_at }} Fresh Sheet </h1>
-
+    <h1> {{ freshsheet.delivery_date }} Fresh Sheet </h1>
+    <h5 style="text-align: center; font-weight: 100;"> All orders must be completed and sent in by {{ freshsheet.delivery_date|date:'l, m/d' }}, 6:00am.</h5>
     <!-- Fresh Sheet Table -->
     <div><a href=".">Reset Sorting</a></div>
 

@@ -10,7 +10,7 @@
     <button id="reset-button" class="ui button">Reset Sorting</button>
     {% for order in orders %}
         {% if forloop.first %}
-            <div class="ui large centered header">{{ order.freshsheet.published_at }} Freshsheet Orders</div>
+            <div class="ui large centered header">{{ order.freshsheet.delivery_date }} Freshsheet Orders</div>
         {% endif %}
     {% endfor %}
 
