@@ -16,6 +16,7 @@ django-semanticui-forms==1.6.5
 django-sendgrid-v5==0.6.86
 ecdsa==0.13
 enum34==1.1.6
+freezegun==0.3.11
 future==0.17.1
 gunicorn==19.7.1
 idna==2.7
