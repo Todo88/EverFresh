@@ -1,7 +1,7 @@
 from freezegun import freeze_time
 import datetime
 import unittest
-from utils import get_next_service_date
+from .utils import get_next_service_date
 
 
 # class TestServiceDates(unittest.TestCase):
