@@ -53,7 +53,7 @@ python-jose==3.0.1
 python-quickbooks==0.7.5
 python3-openid==3.1.0
 pytz==2017.3
-PyYAML==3.13
+PyYAML==5.4
 rauth==0.7.3
 requests==2.20.1
 requests-oauthlib==1.0.0
